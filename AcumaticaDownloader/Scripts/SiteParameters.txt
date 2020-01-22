@@ -1,0 +1,5 @@
+InstanceName=SWKProd
+DatabaseName=SWKProd
+IsNewDatabase=False
+InsertDemoData=False
+AcumaticaERPInstallDirectory=D:\AcumaticaInstalls\18.214.0014\Acumatica ERP
