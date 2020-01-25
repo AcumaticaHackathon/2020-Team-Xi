@@ -47,6 +47,94 @@ namespace AcumaticaDeployer
                 }
             }
         }
+        public static string DefaultDBUser
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBUser"))
+                {
+                    var retval = config.AppSettings.Settings["DefaultDBUser"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.DefaultDBUser;
+                    return retval;
+                }
+                return Properties.Settings.Default.DefaultDBUser;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBUser"))
+                {
+                    config.AppSettings.Settings["DefaultDBUser"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("DefaultDBUser", value);
+                }
+            }
+        }
+        public static string DefaultDBServer
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBServer"))
+                {
+                    var retval = config.AppSettings.Settings["DefaultDBServer"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.DefaultDBServer;
+                    return retval;
+                }
+                return Properties.Settings.Default.DefaultDBServer;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBServer"))
+                {
+                    config.AppSettings.Settings["DefaultDBServer"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("DefaultDBServer", value);
+                }
+            }
+        }
+
+        public static string DefaultDBPassword
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBPassword"))
+                {
+                    var retval = config.AppSettings.Settings["DefaultDBPassword"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.DefaultDBPassword;
+                    return retval;
+                }
+                return Properties.Settings.Default.DefaultDBPassword;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultDBPassword"))
+                {
+                    config.AppSettings.Settings["DefaultDBPassword"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("DefaultDBPassword", value);
+                }
+            }
+        }
         public static string PathToInstalls
         {
             get

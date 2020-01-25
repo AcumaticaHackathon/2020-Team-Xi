@@ -40,8 +40,11 @@ namespace AcumaticaDeployer
         private void BtnOK_Click(object sender, EventArgs e)
         {
             Settings.AcumaticaS3Url = txtAcumaticaURL.Text;
-            Settings.PathToInstalls = txtInstallPath.Text;
+            Settings.PathToInstalls = txtInstallPath.Text + (txtInstallPath.Text.EndsWith("\\") ? "" : "\\");
             Settings.PathToAcumatica = txtRootPath.Text + (txtRootPath.Text.EndsWith("\\")?"":"\\");
+            Settings.DefaultDBUser = txtDBUser.Text;
+            Settings.DefaultDBServer = txtDBServer.Text;
+            Settings.DefaultDBPassword = txtDBPassword.Text;
             Settings.SaveSettings();
             this.Close();
         }

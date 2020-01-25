@@ -17,6 +17,7 @@ namespace AcumaticaDeployer
 {
     public partial class frmDeploy : Form
     {
+        private const string Title = "Acumatica Deployer";
         //private Settings Settings;
         private DownloadItemList Items{ get { return Utils.Items; } }
         public frmDeploy()
@@ -42,12 +43,16 @@ namespace AcumaticaDeployer
         {
             try
             {
-                cboVersion.Items.AddRange(Items.OrderByDescending(i=>i.AppVersion.Major).ThenByDescending(i=>i.AppVersion.Minor).Select(i => i.Version).Distinct().ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls).Select(s => s.Replace(Settings.PathToInstalls, "")).Where(d => d.StartsWith("20")).ToArray<object>());
+                cboVersion.Items.Clear();
+                cboVersion.Items.AddRange(Items.Where(i=>chkPreview.Checked || !i.Preview).OrderByDescending(i=>i.AppVersion.Major).ThenByDescending(i=>i.AppVersion.Minor).Select(i => i.Version).Distinct().ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls).Select(s => s.Replace(Settings.PathToInstalls, "")).Where(d => d.StartsWith("20")).ToArray<object>());
             }
             catch { }
-            this.Text += string.Format(" (Cache Date: {0})", Items.FileDate.ToString("MM-dd-yyyy")) ;
+            this.Text =  string.Format("{0} (Cache Date: {1})",Title, Items.FileDate.ToString("MM-dd-yyyy")) ;
             txtInstance.DataSource = Instances();
             txtInstance.SelectedIndex = -1;
+            txtDBServer.Text  = Settings.DefaultDBServer;
+            txtDBUser.Text = Settings.DefaultDBUser;
+            txtDBPass.Text = Settings.DefaultDBPassword;
             if (Utils.HasError)
                 this.lblMessage.Text += Utils.Error;
         }
@@ -56,7 +61,7 @@ namespace AcumaticaDeployer
         {
             cboPatch.Items.Clear();
             if (cboVersion.SelectedIndex >= 0 && !string.IsNullOrWhiteSpace(cboVersion.Text))
-                cboPatch.Items.AddRange(Items.Where(i=>i.Version==cboVersion.Text).OrderByDescending(i => i.AppVersion).ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString()).Select(s => s.Replace(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString() + @"\", "")).ToArray<object>());
+                cboPatch.Items.AddRange(Items.Where(i=>i.Version==cboVersion.Text).Where(i => chkPreview.Checked || !i.Preview).OrderByDescending(i => i.AppVersion).ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString()).Select(s => s.Replace(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString() + @"\", "")).ToArray<object>());
         }
         private string SourcePath
         {
@@ -95,6 +100,9 @@ namespace AcumaticaDeployer
             else
             {
                 txtDBName.Text = "";
+                txtDBServer.Text = Settings.DefaultDBServer;
+                txtDBUser.Text = Settings.DefaultDBUser;
+                txtDBPass.Text = Settings.DefaultDBPassword;
                 chkDemoData.Enabled = true;
                 chkNewDB.Enabled = true;
                 btnInstall.Enabled = true ;
@@ -136,7 +144,7 @@ namespace AcumaticaDeployer
             var data = File.ReadAllText(AppPath() + @"\Scripts\CreateNewSite.ps1");
             data=data.Replace("{Acumatica Source Directory}", SourcePath);
             File.WriteAllBytes(ErpPath  + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
-            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n";
+            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n";
             File.WriteAllBytes(ErpPath  + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
             data=RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(data));
@@ -258,23 +266,46 @@ namespace AcumaticaDeployer
 
         private void txtInstance_SelectedIndexChanged(object sender, EventArgs e)
         {
+            try
+            {
+                var configFile = new FileInfo(ErpPath + @"\site\web.config");
+                var vdm = new VirtualDirectoryMapping(configFile.DirectoryName, true, configFile.Name);
+                var wcfm = new WebConfigurationFileMap();
+                wcfm.VirtualDirectories.Add("/", vdm);
+                var config = WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
+                var test = config.ConnectionStrings.ConnectionStrings.GetEnumerator();
+                while (test.Current == null || ((ConnectionStringSettings)test.Current)?.Name != "ProjectX")
+                    if (!test.MoveNext())
+                        break;
+                ConnectionStringSettings item = (ConnectionStringSettings)test.Current;
+                if (item.Name != "ProjectX")
+                {
+                    txtDBName.Text ="";
+                    txtDBServer.Text = Settings.DefaultDBServer;
+                    txtDBUser.Text = Settings.DefaultDBUser ;
+                    txtDBPass.Text = Settings.DefaultDBPassword ;
+                }
+                else
+                {
+                    txtDBName.Text = item.ConnectionString.Split(';').FirstOrDefault(s => s.ToLower().Contains("initial catalog"))?.Split('=').Last();
+                    txtDBServer.Text = item.ConnectionString.Split(';').FirstOrDefault(s => s.ToLower().Contains("data source"))?.Split('=').Last();
+                    txtDBUser.Text = item.ConnectionString.Split(';').FirstOrDefault(s => s.ToLower().Contains("user"))?.Split('=').Last();
+                    txtDBPass.Text = item.ConnectionString.Split(';').FirstOrDefault(s => s.ToLower().Contains("password"))?.Split('=').Last();
 
-            var configFile = new FileInfo(ErpPath + @"\site\web.config");
-            var vdm = new VirtualDirectoryMapping(configFile.DirectoryName, true, configFile.Name);
-            var wcfm = new WebConfigurationFileMap();
-            wcfm.VirtualDirectories.Add("/", vdm);
-            var config= WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
-            var test = config.ConnectionStrings.ConnectionStrings.GetEnumerator();
-            while (test.Current == null || ((ConnectionStringSettings)test.Current)?.Name != "ProjectX")
-                if (!test.MoveNext())
-                    break;
-            ConnectionStringSettings item =(ConnectionStringSettings)test.Current;
-            if (item.Name != "ProjectX")
+                }
+            }
+            catch
+            {
                 txtDBName.Text = "";
-            else
-                txtDBName.Text = item.ConnectionString.Split(';').FirstOrDefault(s=>s.Contains("Initial Catalog")).Split('=').Last();
+                txtDBServer.Text = Settings.DefaultDBServer;
+                txtDBUser.Text = Settings.DefaultDBUser;
+                txtDBPass.Text = Settings.DefaultDBPassword;
+            }
         }
 
-
+        private void chkPreview_CheckedChanged(object sender, EventArgs e)
+        {
+            FrmDeploy_Load(sender, e);
+        }
     }
 }

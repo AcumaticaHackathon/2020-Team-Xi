@@ -48,12 +48,19 @@
             this.lblMessage = new System.Windows.Forms.Label();
             this.txtInstance = new System.Windows.Forms.ComboBox();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.chkPreview = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtDBServer = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtDBUser = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtDBPass = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnGetNewVersions
             // 
             this.btnGetNewVersions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGetNewVersions.Location = new System.Drawing.Point(372, 409);
+            this.btnGetNewVersions.Location = new System.Drawing.Point(372, 487);
             this.btnGetNewVersions.Name = "btnGetNewVersions";
             this.btnGetNewVersions.Size = new System.Drawing.Size(113, 23);
             this.btnGetNewVersions.TabIndex = 0;
@@ -101,7 +108,7 @@
             // 
             // txtDBName
             // 
-            this.txtDBName.Location = new System.Drawing.Point(97, 96);
+            this.txtDBName.Location = new System.Drawing.Point(97, 121);
             this.txtDBName.Name = "txtDBName";
             this.txtDBName.Size = new System.Drawing.Size(269, 20);
             this.txtDBName.TabIndex = 6;
@@ -109,7 +116,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 100);
+            this.label3.Location = new System.Drawing.Point(12, 125);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 13);
             this.label3.TabIndex = 8;
@@ -127,7 +134,7 @@
             // chkNewDB
             // 
             this.chkNewDB.AutoSize = true;
-            this.chkNewDB.Location = new System.Drawing.Point(97, 122);
+            this.chkNewDB.Location = new System.Drawing.Point(97, 199);
             this.chkNewDB.Name = "chkNewDB";
             this.chkNewDB.Size = new System.Drawing.Size(66, 17);
             this.chkNewDB.TabIndex = 9;
@@ -137,7 +144,7 @@
             // chkDemoData
             // 
             this.chkDemoData.AutoSize = true;
-            this.chkDemoData.Location = new System.Drawing.Point(182, 122);
+            this.chkDemoData.Location = new System.Drawing.Point(182, 199);
             this.chkDemoData.Name = "chkDemoData";
             this.chkDemoData.Size = new System.Drawing.Size(80, 17);
             this.chkDemoData.TabIndex = 10;
@@ -147,7 +154,7 @@
             // btnInstall
             // 
             this.btnInstall.Enabled = false;
-            this.btnInstall.Location = new System.Drawing.Point(372, 14);
+            this.btnInstall.Location = new System.Drawing.Point(405, 36);
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(75, 23);
             this.btnInstall.TabIndex = 11;
@@ -158,7 +165,7 @@
             // btnUpgrade
             // 
             this.btnUpgrade.Enabled = false;
-            this.btnUpgrade.Location = new System.Drawing.Point(372, 44);
+            this.btnUpgrade.Location = new System.Drawing.Point(405, 66);
             this.btnUpgrade.Name = "btnUpgrade";
             this.btnUpgrade.Size = new System.Drawing.Size(75, 23);
             this.btnUpgrade.TabIndex = 12;
@@ -169,7 +176,7 @@
             // progressBar1
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(0, 438);
+            this.progressBar1.Location = new System.Drawing.Point(0, 516);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(492, 23);
             this.progressBar1.TabIndex = 13;
@@ -179,17 +186,17 @@
             this.rtbLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtbLogs.Location = new System.Drawing.Point(12, 145);
+            this.rtbLogs.Location = new System.Drawing.Point(12, 222);
             this.rtbLogs.Name = "rtbLogs";
             this.rtbLogs.ReadOnly = true;
-            this.rtbLogs.Size = new System.Drawing.Size(473, 258);
+            this.rtbLogs.Size = new System.Drawing.Size(473, 259);
             this.rtbLogs.TabIndex = 14;
             this.rtbLogs.Text = "";
             // 
             // chkPortal
             // 
             this.chkPortal.AutoSize = true;
-            this.chkPortal.Location = new System.Drawing.Point(15, 122);
+            this.chkPortal.Location = new System.Drawing.Point(15, 199);
             this.chkPortal.Name = "chkPortal";
             this.chkPortal.Size = new System.Drawing.Size(53, 17);
             this.chkPortal.TabIndex = 15;
@@ -198,7 +205,7 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(372, 73);
+            this.btnSettings.Location = new System.Drawing.Point(405, 95);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(75, 23);
             this.btnSettings.TabIndex = 16;
@@ -228,7 +235,7 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefresh.Location = new System.Drawing.Point(253, 409);
+            this.btnRefresh.Location = new System.Drawing.Point(253, 487);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(113, 23);
             this.btnRefresh.TabIndex = 19;
@@ -236,11 +243,77 @@
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
+            // chkPreview
+            // 
+            this.chkPreview.AutoSize = true;
+            this.chkPreview.Location = new System.Drawing.Point(372, 18);
+            this.chkPreview.Name = "chkPreview";
+            this.chkPreview.Size = new System.Drawing.Size(102, 17);
+            this.chkPreview.TabIndex = 20;
+            this.chkPreview.Text = "Include Preview";
+            this.chkPreview.UseVisualStyleBackColor = true;
+            this.chkPreview.CheckedChanged += new System.EventHandler(this.chkPreview_CheckedChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(12, 99);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(56, 13);
+            this.label5.TabIndex = 22;
+            this.label5.Text = "DB Server";
+            // 
+            // txtDBServer
+            // 
+            this.txtDBServer.Location = new System.Drawing.Point(97, 95);
+            this.txtDBServer.Name = "txtDBServer";
+            this.txtDBServer.Size = new System.Drawing.Size(269, 20);
+            this.txtDBServer.TabIndex = 21;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(12, 151);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(47, 13);
+            this.label6.TabIndex = 26;
+            this.label6.Text = "DB User";
+            // 
+            // txtDBUser
+            // 
+            this.txtDBUser.Location = new System.Drawing.Point(97, 147);
+            this.txtDBUser.Name = "txtDBUser";
+            this.txtDBUser.Size = new System.Drawing.Size(269, 20);
+            this.txtDBUser.TabIndex = 25;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(12, 177);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(48, 13);
+            this.label7.TabIndex = 24;
+            this.label7.Text = "DB Pass";
+            // 
+            // txtDBPass
+            // 
+            this.txtDBPass.Location = new System.Drawing.Point(97, 173);
+            this.txtDBPass.Name = "txtDBPass";
+            this.txtDBPass.Size = new System.Drawing.Size(269, 20);
+            this.txtDBPass.TabIndex = 23;
+            // 
             // frmDeploy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(492, 461);
+            this.ClientSize = new System.Drawing.Size(492, 539);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.txtDBUser);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.txtDBPass);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.txtDBServer);
+            this.Controls.Add(this.chkPreview);
             this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.txtInstance);
             this.Controls.Add(this.lblMessage);
@@ -292,5 +365,12 @@
         public System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.ComboBox txtInstance;
         private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.CheckBox chkPreview;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtDBServer;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtDBUser;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtDBPass;
     }
 }

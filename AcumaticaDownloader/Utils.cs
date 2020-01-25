@@ -68,10 +68,10 @@ namespace AcumaticaDeployer
         {
             var key = item.Filename;
             var parts = key.Split('/').ToList();
-            if (item.Preview)
+            if (parts.Count > 1)
                 return parts[2];
             else
-                return parts[2];
+                return "";
         }
         public static string GetVersionFolder(string version,string path)
         {
@@ -80,7 +80,11 @@ namespace AcumaticaDeployer
         }
         public static string GetVersion2(string version)
         {
-            var retVal = string.Format("{0}{1}", version.IndexOf(".") > 1 ? "20" : "", version.Substring(0, 4).Replace(".", "R")).Replace(@"\\", @"\");
+            var ver = System.Version.Parse(version);
+            var major = ver.Major.ToString();
+            var minor = (Math.Round((double)(ver.Minor/100.0)));
+            //var retVal = string.Format("{0}{1}", version.IndexOf(".") > 1 ? "20" : "", version.Substring(0, 4).Replace(".", "R")).Replace(@"\\", @"\");
+            var retVal = string.Format("{0}{1}", version.IndexOf(".") > 1 ? "20" : "", string.Format("{0}R{1}",major,minor ));
             return retVal;
         }
         public static bool CheckFile(string key,string path)
