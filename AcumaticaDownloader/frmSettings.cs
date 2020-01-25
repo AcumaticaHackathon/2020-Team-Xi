@@ -13,14 +13,14 @@ namespace AcumaticaDeployer
 {
     public partial class frmSettings : Form
     {
-        private Settings settings;
+        //private Settings Settings;
         public frmSettings()
         {
             InitializeComponent();
-            settings = new Settings();
-            txtAcumaticaURL.Text = settings.AcumaticaS3Url;
-            txtInstallPath.Text = settings.PathToInstalls;
-            txtRootPath.Text = settings.PathToAcumatica;
+            //Settings = new Settings();
+            txtAcumaticaURL.Text = Settings.AcumaticaS3Url;
+            txtInstallPath.Text = Settings.PathToInstalls;
+            txtRootPath.Text = Settings.PathToAcumatica;
         }
 
         private void TxtAcumaticaURL_TextChanged(object sender, EventArgs e)
@@ -39,10 +39,10 @@ namespace AcumaticaDeployer
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
-            settings.AcumaticaS3Url = txtAcumaticaURL.Text;
-            settings.PathToInstalls = txtInstallPath.Text;
-            settings.PathToAcumatica = txtRootPath.Text + (txtRootPath.Text.EndsWith("\\")?"":"\\");
-            settings.SaveSettings();
+            Settings.AcumaticaS3Url = txtAcumaticaURL.Text;
+            Settings.PathToInstalls = txtInstallPath.Text;
+            Settings.PathToAcumatica = txtRootPath.Text + (txtRootPath.Text.EndsWith("\\")?"":"\\");
+            Settings.SaveSettings();
             this.Close();
         }
 

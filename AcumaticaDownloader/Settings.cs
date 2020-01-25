@@ -9,19 +9,21 @@ using System.Windows.Forms;
 
 namespace AcumaticaDeployer
 {
-    public class Settings
+    public static class Settings
     {
-        private Configuration config;
-        public Settings()
+        private static Configuration config;
+        private static void InitSettings()
         {
             if (!File.Exists(Application.StartupPath + @"\settings."))
                 File.Create(Application.StartupPath + @"\settings.");
             config = ConfigurationManager.OpenExeConfiguration(Application.StartupPath + @"\settings.");
         }
-        public string AcumaticaS3Url
+        public static string AcumaticaS3Url
         {
             get
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("AcumaticaS3Url"))
                 {
                     var retval = config.AppSettings.Settings["AcumaticaS3Url"].Value;
@@ -33,6 +35,8 @@ namespace AcumaticaDeployer
             }
             set
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("AcumaticaS3Url"))
                 {
                     config.AppSettings.Settings["AcumaticaS3Url"].Value = value;
@@ -43,10 +47,12 @@ namespace AcumaticaDeployer
                 }
             }
         }
-        public string PathToInstalls
+        public static string PathToInstalls
         {
             get
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("PathToInstalls"))
                 {
                     var retval = config.AppSettings.Settings["PathToInstalls"].Value;
@@ -58,6 +64,8 @@ namespace AcumaticaDeployer
             }
             set
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("PathToInstalls"))
                 {
                     config.AppSettings.Settings["PathToInstalls"].Value = value;
@@ -68,10 +76,12 @@ namespace AcumaticaDeployer
                 }
             }
         }
-        public string PathToAcumatica
+        public static string PathToAcumatica
         {
             get
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("PathToAcumatica"))
                 {
                     var retval = config.AppSettings.Settings["PathToAcumatica"].Value;
@@ -83,6 +93,8 @@ namespace AcumaticaDeployer
             }
             set
             {
+                if (config == null)
+                    InitSettings();
                 if (config.AppSettings.Settings.AllKeys.Contains("PathToAcumatica"))
                 {
                     config.AppSettings.Settings["PathToAcumatica"].Value = value;
@@ -94,8 +106,10 @@ namespace AcumaticaDeployer
             }
         }
 
-        public void SaveSettings()
+        public static void SaveSettings()
         {
+            if (config == null)
+                InitSettings();
             config.Save(ConfigurationSaveMode.Minimal, true);
         }
 

@@ -34,7 +34,6 @@
             this.cboVersion = new System.Windows.Forms.ComboBox();
             this.cboPatch = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtInstance = new System.Windows.Forms.TextBox();
             this.txtDBName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -47,16 +46,18 @@
             this.chkPortal = new System.Windows.Forms.CheckBox();
             this.btnSettings = new System.Windows.Forms.Button();
             this.lblMessage = new System.Windows.Forms.Label();
+            this.txtInstance = new System.Windows.Forms.ComboBox();
+            this.btnRefresh = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnGetNewVersions
             // 
             this.btnGetNewVersions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGetNewVersions.Location = new System.Drawing.Point(229, 299);
+            this.btnGetNewVersions.Location = new System.Drawing.Point(372, 409);
             this.btnGetNewVersions.Name = "btnGetNewVersions";
             this.btnGetNewVersions.Size = new System.Drawing.Size(113, 23);
             this.btnGetNewVersions.TabIndex = 0;
-            this.btnGetNewVersions.Text = "Get New Versions";
+            this.btnGetNewVersions.Text = "Bulk Downloads";
             this.btnGetNewVersions.UseVisualStyleBackColor = true;
             this.btnGetNewVersions.Click += new System.EventHandler(this.BtnGetNewVersions_Click);
             // 
@@ -74,18 +75,20 @@
             this.cboVersion.FormattingEnabled = true;
             this.cboVersion.Location = new System.Drawing.Point(97, 16);
             this.cboVersion.Name = "cboVersion";
-            this.cboVersion.Size = new System.Drawing.Size(121, 21);
+            this.cboVersion.Size = new System.Drawing.Size(269, 21);
             this.cboVersion.TabIndex = 2;
             this.cboVersion.SelectedIndexChanged += new System.EventHandler(this.cboVersion_SelectedIndexChanged);
             this.cboVersion.TextUpdate += new System.EventHandler(this.cboVersion_TextUpdate);
             // 
             // cboPatch
             // 
+            this.cboPatch.DisplayMember = "Label";
             this.cboPatch.FormattingEnabled = true;
             this.cboPatch.Location = new System.Drawing.Point(97, 43);
             this.cboPatch.Name = "cboPatch";
-            this.cboPatch.Size = new System.Drawing.Size(121, 21);
+            this.cboPatch.Size = new System.Drawing.Size(269, 21);
             this.cboPatch.TabIndex = 4;
+            this.cboPatch.ValueMember = "AppVersion";
             // 
             // label2
             // 
@@ -96,19 +99,11 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Patch Level";
             // 
-            // txtInstance
-            // 
-            this.txtInstance.Location = new System.Drawing.Point(97, 70);
-            this.txtInstance.Name = "txtInstance";
-            this.txtInstance.Size = new System.Drawing.Size(121, 20);
-            this.txtInstance.TabIndex = 5;
-            this.txtInstance.TextChanged += new System.EventHandler(this.txtInstance_TextChanged);
-            // 
             // txtDBName
             // 
             this.txtDBName.Location = new System.Drawing.Point(97, 96);
             this.txtDBName.Name = "txtDBName";
-            this.txtDBName.Size = new System.Drawing.Size(121, 20);
+            this.txtDBName.Size = new System.Drawing.Size(269, 20);
             this.txtDBName.TabIndex = 6;
             // 
             // label3
@@ -152,7 +147,7 @@
             // btnInstall
             // 
             this.btnInstall.Enabled = false;
-            this.btnInstall.Location = new System.Drawing.Point(265, 16);
+            this.btnInstall.Location = new System.Drawing.Point(372, 14);
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(75, 23);
             this.btnInstall.TabIndex = 11;
@@ -163,7 +158,7 @@
             // btnUpgrade
             // 
             this.btnUpgrade.Enabled = false;
-            this.btnUpgrade.Location = new System.Drawing.Point(265, 46);
+            this.btnUpgrade.Location = new System.Drawing.Point(372, 44);
             this.btnUpgrade.Name = "btnUpgrade";
             this.btnUpgrade.Size = new System.Drawing.Size(75, 23);
             this.btnUpgrade.TabIndex = 12;
@@ -174,9 +169,9 @@
             // progressBar1
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(0, 328);
+            this.progressBar1.Location = new System.Drawing.Point(0, 438);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(349, 23);
+            this.progressBar1.Size = new System.Drawing.Size(492, 23);
             this.progressBar1.TabIndex = 13;
             // 
             // rtbLogs
@@ -187,7 +182,7 @@
             this.rtbLogs.Location = new System.Drawing.Point(12, 145);
             this.rtbLogs.Name = "rtbLogs";
             this.rtbLogs.ReadOnly = true;
-            this.rtbLogs.Size = new System.Drawing.Size(330, 148);
+            this.rtbLogs.Size = new System.Drawing.Size(473, 258);
             this.rtbLogs.TabIndex = 14;
             this.rtbLogs.Text = "";
             // 
@@ -203,7 +198,7 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(265, 75);
+            this.btnSettings.Location = new System.Drawing.Point(372, 73);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(75, 23);
             this.btnSettings.TabIndex = 16;
@@ -220,11 +215,34 @@
             this.lblMessage.Size = new System.Drawing.Size(0, 13);
             this.lblMessage.TabIndex = 17;
             // 
+            // txtInstance
+            // 
+            this.txtInstance.FormattingEnabled = true;
+            this.txtInstance.Location = new System.Drawing.Point(97, 70);
+            this.txtInstance.Name = "txtInstance";
+            this.txtInstance.Size = new System.Drawing.Size(269, 21);
+            this.txtInstance.TabIndex = 18;
+            this.txtInstance.SelectedIndexChanged += new System.EventHandler(this.txtInstance_SelectedIndexChanged);
+            this.txtInstance.TextChanged += new System.EventHandler(this.txtInstance_TextChanged);
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRefresh.Location = new System.Drawing.Point(253, 409);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(113, 23);
+            this.btnRefresh.TabIndex = 19;
+            this.btnRefresh.Text = "Refresh Cache";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
             // frmDeploy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(349, 351);
+            this.ClientSize = new System.Drawing.Size(492, 461);
+            this.Controls.Add(this.btnRefresh);
+            this.Controls.Add(this.txtInstance);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.chkPortal);
@@ -237,7 +255,6 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtDBName);
-            this.Controls.Add(this.txtInstance);
             this.Controls.Add(this.cboPatch);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cboVersion);
@@ -245,7 +262,7 @@
             this.Controls.Add(this.btnGetNewVersions);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(365, 390);
+            this.MinimumSize = new System.Drawing.Size(500, 500);
             this.Name = "frmDeploy";
             this.Text = "Acumatica Deployer";
             this.Load += new System.EventHandler(this.FrmDeploy_Load);
@@ -261,7 +278,6 @@
         private System.Windows.Forms.ComboBox cboVersion;
         private System.Windows.Forms.ComboBox cboPatch;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtInstance;
         private System.Windows.Forms.TextBox txtDBName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
@@ -274,5 +290,7 @@
         private System.Windows.Forms.CheckBox chkPortal;
         private System.Windows.Forms.Button btnSettings;
         public System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.ComboBox txtInstance;
+        private System.Windows.Forms.Button btnRefresh;
     }
 }
