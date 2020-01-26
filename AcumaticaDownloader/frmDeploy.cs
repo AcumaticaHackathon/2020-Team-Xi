@@ -148,6 +148,7 @@ namespace AcumaticaDeployer
         {
             if (!SelectedVersion.Cached)
             {
+                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion));
                 Utils.DownloadFile(SelectedVersion,OutputHandler );
                 
             }
