@@ -170,22 +170,31 @@ namespace AcumaticaDeployer
         }
         private void BtnUpdateUser_Click(object sender, EventArgs e)
         {
-            SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database);
-            sqlConn.Open();
-            var sqlCommand = new System.Data.SqlClient.SqlCommand("update users set username='" + txtACUser.Text + "', password='" + txtACPass.Text + "', PasswordChangeOnNextLogin=0 where companyid=2 and username='" + txtACUser.Text + "'", sqlConn);
-            if (sqlCommand.ExecuteNonQuery() == 0)
+            try
             {
-                sqlCommand.CommandText = "insert into users (CompanyID, PKID, Username, ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, Password, PasswordChangeable, PasswordChangeOnNextLogin," +
-                           "PasswordNeverExpires, AllowPasswordRecovery, PasswordQuestion, PasswordAnswer, IsApproved, IsPendingActivation, IsHidden, Guest, LastActivityDate, LastLoginDate, LastPasswordChangedDate, CreationDate, IsOnLine, " +
-                           "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
-                           "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, NoteID, MultiFactorType, " +
-                           "MultiFactorOverride, AllowedSessions)" +
-                           "Select CompanyID, newid() as pkid, '" + txtACUser.Text + "' as username , ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, '" + txtACPass.Text + "' as password, PasswordChangeable, 0 as PasswordChangeOnNextLogin," +
-                           "PasswordNeverExpires, AllowPasswordRecovery, PasswordQuestion, PasswordAnswer, IsApproved, IsPendingActivation, IsHidden, Guest, LastActivityDate, LastLoginDate, LastPasswordChangedDate, CreationDate, IsOnLine, " +
-                           "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
-                           "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, newid() as noteid, MultiFactorType, " +
-                           "MultiFactorOverride, AllowedSessions from users where companyid=2 and username='admin'";
-                System.Diagnostics.Debug.WriteLine(sqlCommand.ExecuteNonQuery());
+                using (SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database))
+                {
+                    sqlConn.Open();
+                    var sqlCommand = new System.Data.SqlClient.SqlCommand("update users set username='" + txtACUser.Text + "', password='" + txtACPass.Text + "', PasswordChangeOnNextLogin=0 where companyid=2 and username='" + txtACUser.Text + "'", sqlConn);
+                    if (sqlCommand.ExecuteNonQuery() == 0)
+                    {
+                        sqlCommand.CommandText = "insert into users (CompanyID, PKID, Username, ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, Password, PasswordChangeable, PasswordChangeOnNextLogin," +
+                                   "PasswordNeverExpires, AllowPasswordRecovery, PasswordQuestion, PasswordAnswer, IsApproved, IsPendingActivation, IsHidden, Guest, LastActivityDate, LastLoginDate, LastPasswordChangedDate, CreationDate, IsOnLine, " +
+                                   "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
+                                   "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, NoteID, MultiFactorType, " +
+                                   "MultiFactorOverride, AllowedSessions)" +
+                                   "Select CompanyID, newid() as pkid, '" + txtACUser.Text + "' as username , ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, '" + txtACPass.Text + "' as password, PasswordChangeable, 0 as PasswordChangeOnNextLogin," +
+                                   "PasswordNeverExpires, AllowPasswordRecovery, PasswordQuestion, PasswordAnswer, IsApproved, IsPendingActivation, IsHidden, Guest, LastActivityDate, LastLoginDate, LastPasswordChangedDate, CreationDate, IsOnLine, " +
+                                   "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
+                                   "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, newid() as noteid, MultiFactorType, " +
+                                   "MultiFactorOverride, AllowedSessions from users where companyid=2 and username='admin'";
+                        System.Diagnostics.Debug.WriteLine(sqlCommand.ExecuteNonQuery());
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                WriteOutput(ex.Message);
             }
         }
 
@@ -263,7 +272,7 @@ namespace AcumaticaDeployer
                     chkNewDB.Invoke(new Action(() => chkNewDB.Checked = true)) ;
                     break;
                 default:
-                    picStatus.Invoke(new Action(() => picStatus.Image = Properties.Resources.Err));
+                    chkNewDB.Invoke(new Action(() => chkNewDB.Checked = true));
                     break;
             }
         }
@@ -474,41 +483,59 @@ namespace AcumaticaDeployer
         private bool IsPublishing;
         private void btnInstallCustom_Click(object sender, EventArgs e)
         {
-            ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
-            {
-                CookieContainer = new System.Net.CookieContainer()
-            };
-            client.PublishPackagesCompleted += Client_PublishPackagesCompleted;
-            client.Url = string.Format( "http://localhost/{0}/api/ServiceGate.asmx",txtInstance.Text);
-            LoginResult lr = client.Login(txtACUser.Text, txtACPass.Text);
-            List<string> packages = new List<string>();
-            foreach (string item in cboCustom.CheckedItems)
-            {
-                var fi = new FileInfo(item);
-                packages.Add(fi.Name);
-                client.UploadPackage(fi.Name , System.IO.File.ReadAllBytes(item), true);
-            }
-            IsPublishing = true;
-            client.PublishPackagesAsync(packages.ToArray(), true);
             WriteOutput("Publishing Packages");
-            while (IsPublishing)
-                Application.DoEvents();
+            try
+            {
+                ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
+                {
+                    CookieContainer = new System.Net.CookieContainer()
+                };
+                client.PublishPackagesCompleted += Client_PublishPackagesCompleted;
+                client.Url = string.Format("http://localhost/{0}/api/ServiceGate.asmx", txtInstance.Text);
+                LoginResult lr = client.Login(txtACUser.Text, txtACPass.Text);
+                List<string> packages = new List<string>();
+                foreach (string item in cboCustom.CheckedItems)
+                {
+                    var fi = new FileInfo(item);
+                    packages.Add(fi.Name);
+                    client.UploadPackage(fi.Name, System.IO.File.ReadAllBytes(item), true);
+                }
+                IsPublishing = true;
+                client.PublishPackagesAsync(packages.ToArray(), true);
+
+                while (IsPublishing)
+                    Application.DoEvents();
+            }catch(Exception ex)
+            {
+                WriteOutput(ex.Message);
+                IsPublishing = false;
+            }
         }
         private void btnUnInstallCustom_Click(object sender, EventArgs e)
         {
-            ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
+            try
             {
-                CookieContainer = new System.Net.CookieContainer()
-            };
-            client.UnpublishAllPackagesCompleted += Client_UnpublishAllPackagesCompleted;
-            client.Url = string.Format("http://localhost/{0}/api/ServiceGate.asmx", txtInstance.Text);
-            LoginResult lr = client.Login(txtACUser.Text, txtACPass.Text);
-            List<string> packages = new List<string>();
-            IsPublishing = true;
-            client.UnpublishAllPackagesAsync();
-            WriteOutput("Unpublishing Packages");
-            while (IsPublishing)
-                Application.DoEvents();
+                WriteOutput("Unpublishing Packages");
+                ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
+                {
+                    CookieContainer = new System.Net.CookieContainer()
+                };
+                client.UnpublishAllPackagesCompleted += Client_UnpublishAllPackagesCompleted;
+                client.Url = string.Format("http://localhost/{0}/api/ServiceGate.asmx", txtInstance.Text);
+                LoginResult lr = client.Login(txtACUser.Text, txtACPass.Text);
+                List<string> packages = new List<string>();
+                IsPublishing = true;
+
+                client.UnpublishAllPackagesAsync();
+
+                while (IsPublishing)
+                    Application.DoEvents();
+            }
+            catch(Exception ex)
+            {
+                WriteOutput(ex.Message);
+                IsPublishing = false;
+            }
         }
 
         private void Client_UnpublishAllPackagesCompleted(object sender, AsyncCompletedEventArgs e)
@@ -576,19 +603,25 @@ namespace AcumaticaDeployer
             }
             catch(TaskCanceledException ex)
             { }
-            catch
+            catch(Exception ex)
             {
                 if (connectionSettings == SQLConnectionSettings.Database)
                     chkNewDB.Checked = true;
                 else
-                picStatus.Image = Properties.Resources.Err;
+                {
+                    System.Diagnostics.Debug.Print("TestSQLConnectionAsync:{0}",ex.Message);
+                    picStatus.Image = Properties.Resources.Err;
+                }
             }
         }
 
         private void SqlConn_InfoMessage(object sender, SqlInfoMessageEventArgs e)
         {
-            if(e.Errors?.Count>0)
+            if (e.Errors?.Count > 0)
+            {
+                System.Diagnostics.Debug.Print("SqlConn_InfoMessage");
                 picStatus.Invoke(new Action(() => picStatus.Image = Properties.Resources.Err));
+            }
             else
                 picStatus.Invoke(new Action(() => picStatus.Image = Properties.Resources.OK));
         }
