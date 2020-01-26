@@ -66,7 +66,10 @@ function Create-ParameterFile ()
 
         $private:buffer = @()
         $buffer += ("InstanceName={0}" -f $instance)
+        $buffer += ("DatabaseServer={0}" -f $dbServerName)
         $buffer += ("DatabaseName={0}" -f $dbName)
+        $buffer += ("DatabaseUser={0}" -f $dbUser)
+        $buffer += ("DatabasePass={0}" -f $dbPass)
         $buffer += ("IsNewDatabase={0}" -f $paramIsNewDatabase)
         $buffer += ("InsertDemoData={0}" -f $paramInsertDemoData)
         $buffer += ("AcumaticaERPInstallDirectory={0}" -f $paramAcumaticaERPInstallDirectory)
@@ -118,6 +121,9 @@ function Set-Parameter($pKey, $pValue)
     {
         "InstanceName" { $script:paramInstanceName = $pValue; break}
         "DatabaseName" { $script:paramDatabaseName = $pValue; break}
+        "DatabaseUser" { $script:paramDatabaseUser = $pValue; break}
+        "DatabasePass" { $script:paramDatabasePass = $pValue; break}
+        "DatabaseServer" { $script:paramDatabaseServer = $pValue; break}
         "IsNewDatabase" { $script:paramIsNewDatabase =  Get-ParameterBoolValue $pValue; break}
         "InsertDemoData" { $script:paramInsertDemoData = Get-ParameterBoolValue $pValue; break}
         "AcumaticaERPInstallDirectory" { $script:paramAcumaticaERPInstallDirectory = $pValue; break}
@@ -151,11 +157,26 @@ function Check-Paramters()
         $errorFound = $true
         Write-ImportantInfo ("InstanceName cannot be empty")
     }
+    if ([string]::IsNullOrWhiteSpace($paramDatabaseServer))
+    {
+        $errorFound = $true
+        Write-ImportantInfo ("DatabaseServer cannot be empty")
+    }
 
     if ([string]::IsNullOrWhiteSpace($paramDatabaseName))
     {
         $errorFound = $true
         Write-ImportantInfo ("DatabaseName cannot be empty")
+    }
+     if ([string]::IsNullOrWhiteSpace($paramDatabaseUser))
+    {
+        $errorFound = $true
+        Write-ImportantInfo ("DatabaseUser cannot be empty")
+    }
+     if ([string]::IsNullOrWhiteSpace($paramDatabasePass))
+    {
+        $errorFound = $true
+        Write-ImportantInfo ("DatabasePass cannot be empty")
     }
 
     if($script:paramIsNewDatabase -eq $false -and $script:paramInsertDemoData -eq $true)
@@ -385,11 +406,11 @@ Function CleanupWebConfig($sitePath, $erpPath)
     $xml.Save($webConfigPath)
 }
 
-function Upgrade-AcumaticaSite([string]$siteVirtualDirectoryName, [string]$databaseName, [bool]$isPortal, [string]$acuSitePath, [string]$commandToolDir)
+function Upgrade-AcumaticaSite([string]$siteVirtualDirectoryName,[string]$databaseServer, [string]$databaseName, [bool]$isPortal, [string]$acuSitePath, [string]$commandToolDir,[string]$databaseUser,[string]$databasePass)
 {
     Write-Host " "
     Write-Host "========================================================================================================================" -foregroundcolor $script:writeHostColor
-    Write-Host ("=====    BEGIN: Upgrading site {0} using database {1}" -f $siteVirtualDirectoryName, $databaseName ) -foregroundcolor $script:writeHostColor
+    Write-Host ("=====    BEGIN: Upgrading site {0} using database {1} on server {2}" -f $siteVirtualDirectoryName, $databaseName, $databaseServer ) -foregroundcolor $script:writeHostColor
     Write-Host "========================================================================================================================" -foregroundcolor $script:writeHostColor
     Write-Host " "
     Write-Host " "
@@ -405,10 +426,15 @@ function Upgrade-AcumaticaSite([string]$siteVirtualDirectoryName, [string]$datab
 
     $configMode = '-configmode:"UpgradeSite"'
     $dbNew = '-dbnew:"false"'
-    $dbWinAuth = '-dbsrvwinauth:"True"'
-    $dbServerName = '-dbsrvname:"(local)"'
+    $dbWinAuth = '-dbsrvwinauth:"False"'
+    $dbServerName = ('-dbsrvname:"{0}"' -f $databaseServer)
+    $dbNewUser = '-dbnewuser:"False"'
+    $dbUser = ('-dbuser:"{0}"' -f $databaseUser)
+    $dbPass = ('-dbpass:"{0}"' -f $databasePass)
+    $dbSrvUser = ('-dbsrvuser:"{0}"' -f $databaseUser)
+    $dbSrvPass = ('-dbsrvpass:"{0}"' -f $databasePass)
     $dbName = ('-dbname:"{0}"' -f $databaseName)
-    $dbConnWinAuth = '-dbwinauth:"True"'
+    $dbConnWinAuth = '-dbwinauth:"False"'
     $localWebsite = '-swebsite:"Default Web Site"'
     $portalSite = ('-portal:{0}' -f $isPortal)
     $sitePath = ('-ipath:"{0}"' -f $acuSitePath)
@@ -418,10 +444,10 @@ function Upgrade-AcumaticaSite([string]$siteVirtualDirectoryName, [string]$datab
     Write-Host ""
     Write-Host ("Running {0} using {1}" -f $CMD, $configMode) -ForegroundColor Yellow
     Write-Host ""
-    Write-Host $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $sitePath $appPool $localWebsite $portalSite $virtualDirName $instName
+    Write-Host $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $sitePath $company $appPool $localWebsite $portalSite $virtualDirName $instName $dbUser $dbPass $dbSrvUser $dbSrvPass $dbNewUser
     Write-Host ""
 
-    & $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $sitePath $company $appPool $localWebsite $portalSite $virtualDirName $instName
+    & $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $sitePath $company $appPool $localWebsite $portalSite $virtualDirName $instName $dbUser $dbPass $dbSrvUser $dbSrvPass $dbNewUser
 
     Write-Host " "
     Write-Host "========================================================================================================================" -foregroundcolor $script:writeHostColor
@@ -434,10 +460,10 @@ function Upgrade-AcumaticaSite([string]$siteVirtualDirectoryName, [string]$datab
     Write-Host ""
     Write-Host ("Running {0} using {1}" -f $CMD, $configMode) -ForegroundColor Yellow
     Write-Host ""
-    Write-Host $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $dbShrink $dbUpdate
+    Write-Host $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $dbShrink $dbUpdate $dbUser $dbPass $dbSrvUser $dbSrvPass $dbNewUser
     Write-Host ""
 
-    & $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $dbShrink $dbUpdate
+    & $CMD $configMode $dbNew $dbWinAuth $dbServerName $dbName $dbConnWinAuth $dbShrink $dbUpdate $dbUser $dbPass $dbSrvUser $dbSrvPass $dbNewUser
 
     Write-Host " " 
     Write-Host " "
@@ -515,7 +541,7 @@ Try
     }
 
     [bool]$isPortal = $script:paramIsPortal
-    Upgrade-AcumaticaSite $paramInstanceName $paramDatabaseName $isPortal $sitePath $commandToolPath
+    Upgrade-AcumaticaSite $paramInstanceName $paramDatabaseServer $paramDatabaseName $isPortal $sitePath $commandToolPath  $paramDatabaseUser $paramDatabasePass
 
     CleanupWebConfig $sitePath $erpPath
 }

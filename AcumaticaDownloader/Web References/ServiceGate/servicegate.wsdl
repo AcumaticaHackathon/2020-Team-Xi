@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://acumatica.com" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://acumatica.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://acumatica.com">
+      <s:element name="Process">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Request" type="tns:GraphObject" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="GraphObject" abstract="true">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="CustomViews" type="tns:ArrayOfView" />
+          <s:element minOccurs="1" maxOccurs="1" name="GraphState" type="tns:GraphObjectState" />
+          <s:element minOccurs="1" maxOccurs="1" name="UpdateMode" type="tns:GraphUpdateMode" />
+          <s:element minOccurs="1" maxOccurs="1" name="ProcessStatus" type="tns:PXLongRunStatus" />
+          <s:element minOccurs="0" maxOccurs="1" name="Log" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfView">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="View" nillable="true" type="tns:View" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="View">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="SelectAction" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="SelectStartRow" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="SelectMaxRows" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="SelectTotalRows" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectParameters" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectSearches" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectSortColumns" type="tns:ArrayOfString" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectDescendings" type="tns:ArrayOfBoolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="SelectDiscardResults" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="SelectNativeRows" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectRows" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="InsertDiscardResults" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="InsertRows" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="UpdateDiscardResults" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="UpdateRows" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="0" maxOccurs="1" default="true" name="DeleteDiscardResults" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="DeleteRows" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="Answer" type="tns:WebDialogResult" />
+          <s:element minOccurs="0" maxOccurs="1" name="ViewName" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheItems" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheItems" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheInserted" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheInserted" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheUpdated" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheUpdated" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheDeleted" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheDeleted" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="1" maxOccurs="1" name="QuerySelectAllRecords" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="QuerySelectDefault" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheCurrent" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheCurrent" />
+          <s:element minOccurs="1" maxOccurs="1" name="QueryCacheItemsTranslated" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="CacheItemsTranslated" type="tns:ArrayOfAnyType" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectActionName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfAnyType">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="anyType" nillable="true" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfBoolean">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="boolean" type="s:boolean" />
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="WebDialogResult">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="OK" />
+          <s:enumeration value="Cancel" />
+          <s:enumeration value="Abort" />
+          <s:enumeration value="Retry" />
+          <s:enumeration value="Ignore" />
+          <s:enumeration value="Yes" />
+          <s:enumeration value="No" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="GraphObjectState">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="Load" />
+          <s:enumeration value="Unload" />
+          <s:enumeration value="LoadUnload" />
+          <s:enumeration value="Clear" />
+          <s:enumeration value="ClearUnload" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="GraphUpdateMode">
+        <s:restriction base="s:string">
+          <s:enumeration value="All" />
+          <s:enumeration value="InterfaceFields" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="PXLongRunStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="NotExists" />
+          <s:enumeration value="InProcess" />
+          <s:enumeration value="Completed" />
+          <s:enumeration value="Aborted" />
+        </s:restriction>
+      </s:simpleType>
+      <s:complexType name="GraphServerStub">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:GraphObject">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="ClassName" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="RowServerStub">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ClassName" type="s:string" />
+          <s:any minOccurs="0" maxOccurs="unbounded" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ProcessResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProcessResult" type="tns:GraphObject" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ProcessBatch">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="requests" type="tns:ArrayOfGraphObject" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfGraphObject">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="GraphObject" nillable="true" type="tns:GraphObject" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ProcessBatchResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProcessBatchResult" type="tns:ArrayOfGraphObject" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EnumTables">
+        <s:complexType />
+      </s:element>
+      <s:element name="EnumTablesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EnumTablesResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EnumTablesEx">
+        <s:complexType />
+      </s:element>
+      <s:element name="EnumTablesExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EnumTablesExResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EnumGraphs">
+        <s:complexType />
+      </s:element>
+      <s:element name="EnumGraphsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EnumGraphsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportEnumNames">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReportEnumNamesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReportEnumNamesResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportEnumTableNames">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="fullName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportEnumTableNamesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReportEnumTableNamesResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportGetXml">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportGetXmlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReportGetXmlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportGetVersionXml">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ver" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportGetVersionXmlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReportGetVersionXmlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportSave">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="xml" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportSaveResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReportSaveVersionXml">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ver" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="xml" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportSaveVersionXmlResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReportSaveEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="xml" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="createVersion" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="versionDescription" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportSaveExResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReportGetPreview">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="xml" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="topCount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportGetPreviewResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReportGetPreviewResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SetBusinessDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="date" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SetBusinessDateResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UploadPackage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="packageContents" type="s:base64Binary" />
+            <s:element minOccurs="1" maxOccurs="1" name="replaceIfPackageExists" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UploadPackageResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="PublishPackages">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageNames" type="tns:ArrayOfString" />
+            <s:element minOccurs="1" maxOccurs="1" name="mergeWithExistingPackages" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PublishPackagesResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="CleanupPublish">
+        <s:complexType />
+      </s:element>
+      <s:element name="CleanupPublishResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UnpublishAllPackages">
+        <s:complexType />
+      </s:element>
+      <s:element name="UnpublishAllPackagesResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetPackage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPackageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPackageResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoginEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="apiVersion" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="LoginResult">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Code" type="tns:ErrorCode" />
+          <s:element minOccurs="0" maxOccurs="1" name="Message" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Session" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="ErrorCode">
+        <s:restriction base="s:string">
+          <s:enumeration value="OK" />
+          <s:enumeration value="INVALID_CREDENTIALS" />
+          <s:enumeration value="INTERNAL_ERROR" />
+          <s:enumeration value="INVALID_API_VERSION" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="LoginExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoginExResult" type="tns:LoginResult" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Login">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoginResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoginResult" type="tns:LoginResult" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Logout">
+        <s:complexType />
+      </s:element>
+      <s:element name="LogoutResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ProcessSoapIn">
+    <wsdl:part name="parameters" element="tns:Process" />
+  </wsdl:message>
+  <wsdl:message name="ProcessSoapOut">
+    <wsdl:part name="parameters" element="tns:ProcessResponse" />
+  </wsdl:message>
+  <wsdl:message name="ProcessBatchSoapIn">
+    <wsdl:part name="parameters" element="tns:ProcessBatch" />
+  </wsdl:message>
+  <wsdl:message name="ProcessBatchSoapOut">
+    <wsdl:part name="parameters" element="tns:ProcessBatchResponse" />
+  </wsdl:message>
+  <wsdl:message name="EnumTablesSoapIn">
+    <wsdl:part name="parameters" element="tns:EnumTables" />
+  </wsdl:message>
+  <wsdl:message name="EnumTablesSoapOut">
+    <wsdl:part name="parameters" element="tns:EnumTablesResponse" />
+  </wsdl:message>
+  <wsdl:message name="EnumTablesExSoapIn">
+    <wsdl:part name="parameters" element="tns:EnumTablesEx" />
+  </wsdl:message>
+  <wsdl:message name="EnumTablesExSoapOut">
+    <wsdl:part name="parameters" element="tns:EnumTablesExResponse" />
+  </wsdl:message>
+  <wsdl:message name="EnumGraphsSoapIn">
+    <wsdl:part name="parameters" element="tns:EnumGraphs" />
+  </wsdl:message>
+  <wsdl:message name="EnumGraphsSoapOut">
+    <wsdl:part name="parameters" element="tns:EnumGraphsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportEnumNamesSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportEnumNames" />
+  </wsdl:message>
+  <wsdl:message name="ReportEnumNamesSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportEnumNamesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportEnumTableNamesSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportEnumTableNames" />
+  </wsdl:message>
+  <wsdl:message name="ReportEnumTableNamesSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportEnumTableNamesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetXmlSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportGetXml" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetXmlSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportGetXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetVersionXmlSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportGetVersionXml" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetVersionXmlSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportGetVersionXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportSave" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportSaveResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveVersionXmlSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportSaveVersionXml" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveVersionXmlSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportSaveVersionXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveExSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportSaveEx" />
+  </wsdl:message>
+  <wsdl:message name="ReportSaveExSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportSaveExResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetPreviewSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportGetPreview" />
+  </wsdl:message>
+  <wsdl:message name="ReportGetPreviewSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportGetPreviewResponse" />
+  </wsdl:message>
+  <wsdl:message name="SetBusinessDateSoapIn">
+    <wsdl:part name="parameters" element="tns:SetBusinessDate" />
+  </wsdl:message>
+  <wsdl:message name="SetBusinessDateSoapOut">
+    <wsdl:part name="parameters" element="tns:SetBusinessDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="UploadPackageSoapIn">
+    <wsdl:part name="parameters" element="tns:UploadPackage" />
+  </wsdl:message>
+  <wsdl:message name="UploadPackageSoapOut">
+    <wsdl:part name="parameters" element="tns:UploadPackageResponse" />
+  </wsdl:message>
+  <wsdl:message name="PublishPackagesSoapIn">
+    <wsdl:part name="parameters" element="tns:PublishPackages" />
+  </wsdl:message>
+  <wsdl:message name="PublishPackagesSoapOut">
+    <wsdl:part name="parameters" element="tns:PublishPackagesResponse" />
+  </wsdl:message>
+  <wsdl:message name="CleanupPublishSoapIn">
+    <wsdl:part name="parameters" element="tns:CleanupPublish" />
+  </wsdl:message>
+  <wsdl:message name="CleanupPublishSoapOut">
+    <wsdl:part name="parameters" element="tns:CleanupPublishResponse" />
+  </wsdl:message>
+  <wsdl:message name="UnpublishAllPackagesSoapIn">
+    <wsdl:part name="parameters" element="tns:UnpublishAllPackages" />
+  </wsdl:message>
+  <wsdl:message name="UnpublishAllPackagesSoapOut">
+    <wsdl:part name="parameters" element="tns:UnpublishAllPackagesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPackageSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPackage" />
+  </wsdl:message>
+  <wsdl:message name="GetPackageSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPackageResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoginExSoapIn">
+    <wsdl:part name="parameters" element="tns:LoginEx" />
+  </wsdl:message>
+  <wsdl:message name="LoginExSoapOut">
+    <wsdl:part name="parameters" element="tns:LoginExResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoginSoapIn">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="LoginSoapOut">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="LogoutSoapIn">
+    <wsdl:part name="parameters" element="tns:Logout" />
+  </wsdl:message>
+  <wsdl:message name="LogoutSoapOut">
+    <wsdl:part name="parameters" element="tns:LogoutResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceGateSoap">
+    <wsdl:operation name="Process">
+      <wsdl:input message="tns:ProcessSoapIn" />
+      <wsdl:output message="tns:ProcessSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ProcessBatch">
+      <wsdl:input message="tns:ProcessBatchSoapIn" />
+      <wsdl:output message="tns:ProcessBatchSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EnumTables">
+      <wsdl:input message="tns:EnumTablesSoapIn" />
+      <wsdl:output message="tns:EnumTablesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EnumTablesEx">
+      <wsdl:input message="tns:EnumTablesExSoapIn" />
+      <wsdl:output message="tns:EnumTablesExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EnumGraphs">
+      <wsdl:input message="tns:EnumGraphsSoapIn" />
+      <wsdl:output message="tns:EnumGraphsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportEnumNames">
+      <wsdl:input message="tns:ReportEnumNamesSoapIn" />
+      <wsdl:output message="tns:ReportEnumNamesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportEnumTableNames">
+      <wsdl:input message="tns:ReportEnumTableNamesSoapIn" />
+      <wsdl:output message="tns:ReportEnumTableNamesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetXml">
+      <wsdl:input message="tns:ReportGetXmlSoapIn" />
+      <wsdl:output message="tns:ReportGetXmlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetVersionXml">
+      <wsdl:input message="tns:ReportGetVersionXmlSoapIn" />
+      <wsdl:output message="tns:ReportGetVersionXmlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportSave">
+      <wsdl:input message="tns:ReportSaveSoapIn" />
+      <wsdl:output message="tns:ReportSaveSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportSaveVersionXml">
+      <wsdl:input message="tns:ReportSaveVersionXmlSoapIn" />
+      <wsdl:output message="tns:ReportSaveVersionXmlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportSaveEx">
+      <wsdl:input message="tns:ReportSaveExSoapIn" />
+      <wsdl:output message="tns:ReportSaveExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetPreview">
+      <wsdl:input message="tns:ReportGetPreviewSoapIn" />
+      <wsdl:output message="tns:ReportGetPreviewSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SetBusinessDate">
+      <wsdl:input message="tns:SetBusinessDateSoapIn" />
+      <wsdl:output message="tns:SetBusinessDateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadPackage">
+      <wsdl:input message="tns:UploadPackageSoapIn" />
+      <wsdl:output message="tns:UploadPackageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PublishPackages">
+      <wsdl:input message="tns:PublishPackagesSoapIn" />
+      <wsdl:output message="tns:PublishPackagesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CleanupPublish">
+      <wsdl:input message="tns:CleanupPublishSoapIn" />
+      <wsdl:output message="tns:CleanupPublishSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UnpublishAllPackages">
+      <wsdl:input message="tns:UnpublishAllPackagesSoapIn" />
+      <wsdl:output message="tns:UnpublishAllPackagesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPackage">
+      <wsdl:input message="tns:GetPackageSoapIn" />
+      <wsdl:output message="tns:GetPackageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LoginEx">
+      <wsdl:input message="tns:LoginExSoapIn" />
+      <wsdl:output message="tns:LoginExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <wsdl:input message="tns:LoginSoapIn" />
+      <wsdl:output message="tns:LoginSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Logout">
+      <wsdl:input message="tns:LogoutSoapIn" />
+      <wsdl:output message="tns:LogoutSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceGateSoap" type="tns:ServiceGateSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Process">
+      <soap:operation soapAction="http://acumatica.com/Process" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessBatch">
+      <soap:operation soapAction="http://acumatica.com/ProcessBatch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EnumTables">
+      <soap:operation soapAction="http://acumatica.com/EnumTables" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EnumTablesEx">
+      <soap:operation soapAction="http://acumatica.com/EnumTablesEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EnumGraphs">
+      <soap:operation soapAction="http://acumatica.com/EnumGraphs" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportEnumNames">
+      <soap:operation soapAction="http://acumatica.com/ReportEnumNames" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportEnumTableNames">
+      <soap:operation soapAction="http://acumatica.com/ReportEnumTableNames" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetXml">
+      <soap:operation soapAction="http://acumatica.com/ReportGetXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetVersionXml">
+      <soap:operation soapAction="http://acumatica.com/ReportGetVersionXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportSave">
+      <soap:operation soapAction="http://acumatica.com/ReportSave" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportSaveVersionXml">
+      <soap:operation soapAction="http://acumatica.com/ReportSaveVersionXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportSaveEx">
+      <soap:operation soapAction="http://acumatica.com/ReportSaveEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportGetPreview">
+      <soap:operation soapAction="http://acumatica.com/ReportGetPreview" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetBusinessDate">
+      <soap:operation soapAction="http://acumatica.com/SetBusinessDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UploadPackage">
+      <soap:operation soapAction="http://acumatica.com/UploadPackage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PublishPackages">
+      <soap:operation soapAction="http://acumatica.com/PublishPackages" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CleanupPublish">
+      <soap:operation soapAction="http://acumatica.com/CleanupPublish" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnpublishAllPackages">
+      <soap:operation soapAction="http://acumatica.com/UnpublishAllPackages" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPackage">
+      <soap:operation soapAction="http://acumatica.com/GetPackage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoginEx">
+      <soap:operation soapAction="http://acumatica.com/LoginEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <soap:operation soapAction="http://acumatica.com/Login" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Logout">
+      <soap:operation soapAction="http://acumatica.com/Logout" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServiceGate">
+    <wsdl:port name="ServiceGateSoap" binding="tns:ServiceGateSoap">
+      <soap:address location="http://localhost/test/api/servicegate.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

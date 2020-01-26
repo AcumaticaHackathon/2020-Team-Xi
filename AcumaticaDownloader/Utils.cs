@@ -164,6 +164,21 @@ namespace AcumaticaDeployer
                 return progress;
                     }
         }
+        public static string[] Customizations
+        {
+            get
+            {
+                var retVal = new List<string>();
+                var files = System.IO.Directory.GetFiles(Settings.CustomizationPath,"*.zip");
+                foreach(var file in files)
+                {
+                    var zip=Ionic.Zip.ZipFile.Read(file);
+                    if (zip.Entries.Where(z => z.FileName.ToLower().Contains("project.xml")).Count() > 0)
+                        retVal.Add(file);
+                }
+                return retVal.ToArray();
+            }
+        }
     }
     public static class StringExt
     {

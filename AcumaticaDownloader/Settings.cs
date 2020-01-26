@@ -105,6 +105,36 @@ namespace AcumaticaDeployer
                 }
             }
         }
+        public static string CustomizationPath
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("CustomizationPath"))
+                {
+                    var retval = config.AppSettings.Settings["CustomizationPath"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.CustomizationFolder;
+                    return retval;
+                }
+                return Properties.Settings.Default.CustomizationFolder;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("CustomizationPath"))
+                {
+                    config.AppSettings.Settings["CustomizationPath"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("CustomizationPath", value);
+                }
+            }
+        }
+
 
         public static string DefaultDBPassword
         {
@@ -161,6 +191,64 @@ namespace AcumaticaDeployer
                 else
                 {
                     config.AppSettings.Settings.Add("PathToInstalls", value);
+                }
+            }
+        }
+        public static string DefaultAcumaticaPassword
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultAcumaticaPassword"))
+                {
+                    var retval = config.AppSettings.Settings["DefaultAcumaticaPassword"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.DefaultAcumaticaPassword;
+                    return retval;
+                }
+                return Properties.Settings.Default.DefaultAcumaticaPassword;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultAcumaticaPassword"))
+                {
+                    config.AppSettings.Settings["DefaultAcumaticaPassword"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("DefaultAcumaticaPassword", value);
+                }
+            }
+        }
+        public static string DefaultAcumaticaAdmin
+        {
+            get
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultAcumaticaAdmin"))
+                {
+                    var retval = config.AppSettings.Settings["DefaultAcumaticaAdmin"].Value;
+                    if (string.IsNullOrWhiteSpace(retval))
+                        retval = Properties.Settings.Default.DefaultAcumaticaAdmin;
+                    return retval;
+                }
+                return Properties.Settings.Default.DefaultAcumaticaAdmin;
+            }
+            set
+            {
+                if (config == null)
+                    InitSettings();
+                if (config.AppSettings.Settings.AllKeys.Contains("DefaultAcumaticaAdmin"))
+                {
+                    config.AppSettings.Settings["DefaultAcumaticaAdmin"].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add("DefaultAcumaticaAdmin", value);
                 }
             }
         }

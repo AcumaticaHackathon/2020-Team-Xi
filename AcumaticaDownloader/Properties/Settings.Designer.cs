@@ -92,5 +92,51 @@ namespace AcumaticaDeployer.Properties {
                 this["DefaultDBServer"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/test/api/servicegate.asmx")]
+        public string AcumaticaDeployer_ServiceGate_ServiceGate {
+            get {
+                return ((string)(this["AcumaticaDeployer_ServiceGate_ServiceGate"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CustomizationFolder {
+            get {
+                return ((string)(this["CustomizationFolder"]));
+            }
+            set {
+                this["CustomizationFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultAcumaticaPassword {
+            get {
+                return ((string)(this["DefaultAcumaticaPassword"]));
+            }
+            set {
+                this["DefaultAcumaticaPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultAcumaticaAdmin {
+            get {
+                return ((string)(this["DefaultAcumaticaAdmin"]));
+            }
+            set {
+                this["DefaultAcumaticaAdmin"] = value;
+            }
+        }
     }
 }

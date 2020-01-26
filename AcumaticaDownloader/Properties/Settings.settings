@@ -20,5 +20,17 @@
     <Setting Name="DefaultDBServer" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AcumaticaDeployer_ServiceGate_ServiceGate" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost/test/api/servicegate.asmx</Value>
+    </Setting>
+    <Setting Name="CustomizationFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultAcumaticaPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultAcumaticaAdmin" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

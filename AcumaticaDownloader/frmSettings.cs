@@ -21,11 +21,17 @@ namespace AcumaticaDeployer
             txtAcumaticaURL.Text = Settings.AcumaticaS3Url;
             txtInstallPath.Text = Settings.PathToInstalls;
             txtRootPath.Text = Settings.PathToAcumatica;
+            txtDBUser.Text = Settings.DefaultDBUser;
+            txtDBServer.Text=Settings.DefaultDBServer  ;
+            txtDBPassword.Text=Settings.DefaultDBPassword ;
+            txtCustomizationPath.Text=Settings.CustomizationPath ;
+            txtACUser.Text=Settings.DefaultAcumaticaAdmin;
+            txtACPass.Text=Settings.DefaultAcumaticaPassword ;
         }
 
         private void TxtAcumaticaURL_TextChanged(object sender, EventArgs e)
         {
-            var test = Utils.GetResults(txtAcumaticaURL.Text);
+            Utils.GetResults(txtAcumaticaURL.Text);
             if (Utils.HasError)
                 picStatus.Image = Properties.Resources.Err;
             else
@@ -45,26 +51,50 @@ namespace AcumaticaDeployer
             Settings.DefaultDBUser = txtDBUser.Text;
             Settings.DefaultDBServer = txtDBServer.Text;
             Settings.DefaultDBPassword = txtDBPassword.Text;
+            Settings.CustomizationPath = txtCustomizationPath.Text;
+            Settings.DefaultAcumaticaAdmin = txtACUser.Text;
+            Settings.DefaultAcumaticaPassword = txtACPass.Text;
             Settings.SaveSettings();
             this.Close();
         }
 
         private void BtnOFDInstalls_Click(object sender, EventArgs e)
         {
-            var ofd = new FolderBrowserDialog();
-            ofd.SelectedPath = txtInstallPath.Text;
-            ofd.Description = "Select path for Install Media";
+            var ofd = new FolderBrowserDialog
+            {
+                SelectedPath = txtInstallPath.Text,
+                Description = "Select path for Install Media"
+            };
             if (ofd.ShowDialog() == DialogResult.OK)
                 txtInstallPath.Text = ofd.SelectedPath;
         }
 
         private void BtnOFDRoot_Click(object sender, EventArgs e)
         {
-            var ofd = new FolderBrowserDialog();
-            ofd.SelectedPath = txtRootPath.Text;
-            ofd.Description = "Select path to Acumatica Root folder";
+            var ofd = new FolderBrowserDialog
+            {
+                SelectedPath = txtRootPath.Text,
+                Description = "Select path to Acumatica Root folder"
+            };
             if (ofd.ShowDialog() == DialogResult.OK)
                 txtRootPath.Text = ofd.SelectedPath;
+        }
+
+        private void btnCustPath_Click(object sender, EventArgs e)
+        {
+            var ofd = new FolderBrowserDialog
+            {
+                SelectedPath = txtCustomizationPath.Text,
+                Description = "Select path to Acumatica Customization folder"
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+                txtCustomizationPath.Text = ofd.SelectedPath;
+
+        }
+
+        private void frmSettings_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
