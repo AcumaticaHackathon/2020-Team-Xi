@@ -22,7 +22,7 @@ namespace AcumaticaDeployer
     {
         private const string Title = "Acumatica Deployer";
         //private Settings Settings;
-        private DownloadItemList Items{ get { return Utils.Items; } }
+        private DownloadItemList Items { get { return Utils.Items; } }
         public frmDeploy()
         {
             InitializeComponent();
@@ -31,7 +31,7 @@ namespace AcumaticaDeployer
 
             //Settings = new Settings();
             //Items = DownloadItemList.GetList();
-            
+
         }
         private void DownloadProgress(object sender, DownloadProgressChangedEventArgs e)
         {
@@ -48,25 +48,26 @@ namespace AcumaticaDeployer
             {
                 cboVersion.SelectedIndex = -1;
                 cboVersion.Items.Clear();
-                cboVersion.Items.AddRange(Items.Where(i=>chkPreview.Checked || !i.Preview).OrderByDescending(i=>i.AppVersion.Major).ThenByDescending(i=>i.AppVersion.Minor).Select(i => i.Version).Distinct().ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls).Select(s => s.Replace(Settings.PathToInstalls, "")).Where(d => d.StartsWith("20")).ToArray<object>());
+                cboVersion.Items.AddRange(Items.Where(i => chkPreview.Checked || !i.Preview).OrderByDescending(i => i.AppVersion.Major).ThenByDescending(i => i.AppVersion.Minor).Select(i => i.Version).Distinct().ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls).Select(s => s.Replace(Settings.PathToInstalls, "")).Where(d => d.StartsWith("20")).ToArray<object>());
             }
             catch { }
             try
             {
-               cboCustom.Items.Clear();
+                cboCustom.Items.Clear();
                 cboCustom.Items.AddRange(Utils.Customizations);
             }
             catch { }
-            this.Text =  string.Format("{0} (Cache Date: {1})",Title, Items.FileDate.ToString("MM-dd-yyyy")) ;
+            this.Text = string.Format("{0} (Cache Date: {1})", Title, Items.FileDate.ToString("MM-dd-yyyy"));
             txtInstance.DataSource = Instances();
             txtInstance.SelectedIndex = -1;
-            txtDBServer.Text  = Settings.DefaultDBServer;
+            txtDBServer.Text = Settings.DefaultDBServer;
             txtDBUser.Text = Settings.DefaultDBUser;
             txtDBPass.Text = Settings.DefaultDBPassword;
             txtACUser.Text = Settings.DefaultAcumaticaAdmin;
             txtACPass.Text = Settings.DefaultAcumaticaPassword;
             if (Utils.HasError)
                 this.lblMessage.Text += Utils.Error;
+            FillOptions();
         }
 
         private void cboVersion_SelectedIndexChanged(object sender, EventArgs e)
@@ -74,7 +75,7 @@ namespace AcumaticaDeployer
             cboPatch.SelectedIndex = -1;
             cboPatch.Items.Clear();
             if (cboVersion.SelectedIndex >= 0 && !string.IsNullOrWhiteSpace(cboVersion.Text))
-                cboPatch.Items.AddRange(Items.Where(i=>i.Version==cboVersion.Text).Where(i => chkPreview.Checked || !i.Preview).OrderByDescending(i => i.AppVersion).ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString()).Select(s => s.Replace(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString() + @"\", "")).ToArray<object>());
+                cboPatch.Items.AddRange(Items.Where(i => i.Version == cboVersion.Text).Where(i => chkPreview.Checked || !i.Preview).OrderByDescending(i => i.AppVersion).ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString()).Select(s => s.Replace(Settings.PathToInstalls + @"\" + cboVersion.SelectedItem.ToString() + @"\", "")).ToArray<object>());
         }
         private string SourcePath
         {
@@ -97,10 +98,117 @@ namespace AcumaticaDeployer
                 return string.Format("{0}{1}", Settings.PathToAcumatica, txtInstance.Text);
             }
         }
+        private void UpdateWebConfig()
+        {
+            var config = webConfig();
+            foreach (var item in GetOptions())
+            {
+                switch (item.Area)
+                {
+                    case "AppSettings":
+                        try
+                        {
+                            if (config.AppSettings.Settings.AllKeys.Contains(item.Name))
+                                config.AppSettings.Settings[item.Name].Value = item.Value;
+                            else
+                                config.AppSettings.Settings.Add(item.Name, item.Value);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex.Message);
+                        }
+                        break;
+                    case "compilation":
+                        var element = (System.Web.Configuration.SystemWebSectionGroup)config.GetSectionGroup("system.web");//.ElementInformation("compilation");
+                        var comp = element.Compilation;
+                        comp.GetType().GetProperty(item.Name).SetValue(comp, item.Value);
 
+                        break;
+                    default:
+                        break;
+                }
+            }
+            config.Save();
+        }
+        private DevOptions GetOptions()
+        {
+            var retVal = new DevOptions();
+            foreach (Control control in OptionPanel.Controls)
+            {
+                var type = control.GetType().ToString();
+                switch (type)
+                {
+                    case "CheckBox":
+                        var chk = (CheckBox)control;
+                        var item = retVal.First(f => f.Name == chk.Text);
+                        item.Value = chk.Checked.ToString();
+                        retVal.Add(item);
+                        break;
+                    case "NumericUpDown":
+                        //TODO: process box
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return retVal;
+        }
+        private void FillOptions()
+        {
+            var list = new DevOptions();
+            var row = 0;
+            foreach (var option in list)
+            {
+                var lbl = new Label() { AutoSize = true, TextAlign = ContentAlignment.MiddleLeft };
+
+                switch (option.Type)
+                {
+
+
+                    case "boolean":
+                        var chk = new CheckBox()
+                        {
+                            Text = option.Label,
+                            Checked = Boolean.Parse(option.Recommend),
+                            Tag = option.Area,
+                            AutoSize = true,
+                            TextAlign = ContentAlignment.MiddleLeft
+                        };
+                        toolTip1.SetToolTip(chk, option.Desc);
+                        OptionPanel.Controls.Add(lbl);
+                        OptionPanel.Controls.Add(chk);
+                        OptionPanel.SetRow(lbl, row);
+                        OptionPanel.SetColumn(lbl, 0);
+                        OptionPanel.SetRow(chk, row);
+                        OptionPanel.SetColumn(chk, 1);
+                        break;
+                    case "int":
+                        var num = new NumericUpDown()
+                        {
+                            Value = int.Parse(option.Recommend),
+                            Tag = option.Area,
+                            AutoSize = true,
+                        };
+                        toolTip1.SetToolTip(num, option.Desc);
+                        lbl.Text = option.Label;
+                        OptionPanel.Controls.Add(lbl);
+                        OptionPanel.Controls.Add(num);
+                        OptionPanel.SetRow(lbl, row);
+                        OptionPanel.SetColumn(lbl, 0);
+                        OptionPanel.SetRow(num, row);
+                        OptionPanel.SetColumn(num, 1);
+                        break;
+                    default:
+                        break;
+                }
+
+                row += 1;
+                OptionPanel.RowCount = row;
+            }
+        }
         private void txtInstance_TextChanged(object sender, EventArgs e)
         {
-            if(System.IO.Directory.Exists(ErpPath) && System.IO.Directory.Exists(ErpPath + "\\site"))
+            if (System.IO.Directory.Exists(ErpPath) && System.IO.Directory.Exists(ErpPath + "\\site"))
             {
                 txtInstance_SelectedIndexChanged(sender, e);
                 chkDemoData.Enabled = false;
@@ -121,8 +229,8 @@ namespace AcumaticaDeployer
                 txtDBPass.Text = Settings.DefaultDBPassword;
                 chkDemoData.Enabled = true;
                 chkNewDB.Enabled = true;
-                btnInstall.Enabled = true ;
-                btnUpgrade.Enabled = false ;
+                btnInstall.Enabled = true;
+                btnUpgrade.Enabled = false;
 
                 //chkDemoData.Checked = false;
                 //chkNewDB.Checked = true;
@@ -137,7 +245,7 @@ namespace AcumaticaDeployer
         {
             get
             {
-                if(cboPatch.SelectedItem !=null)
+                if (cboPatch.SelectedItem != null)
                 {
                     return (DownloadItem)cboPatch.SelectedItem;
                 }
@@ -149,23 +257,28 @@ namespace AcumaticaDeployer
             if (!SelectedVersion.Cached)
             {
                 WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion));
-                Utils.DownloadFile(SelectedVersion,OutputHandler );
-                
+                Utils.DownloadFile(SelectedVersion, OutputHandler);
+
             }
-            if(!Directory.Exists(ErpPath))
-                Directory.CreateDirectory(ErpPath );
+            if (!Directory.Exists(ErpPath))
+                Directory.CreateDirectory(ErpPath);
             if (!Directory.Exists(ErpPath + @"\Scripts"))
-                Directory.CreateDirectory(ErpPath  + @"\Scripts");
+                Directory.CreateDirectory(ErpPath + @"\Scripts");
             if (!Directory.Exists(ErpPath + @"\Scripts\Setup"))
-                Directory.CreateDirectory(ErpPath  + @"\Scripts\Setup");
+                Directory.CreateDirectory(ErpPath + @"\Scripts\Setup");
+            if (!Directory.Exists(ErpPath + @"\Mods"))
+                Directory.CreateDirectory(ErpPath + @"\Mods");
             var data = File.ReadAllText(AppPath() + @"\Scripts\CreateNewSite.ps1");
-            data=data.Replace("{Acumatica Source Directory}", SourcePath);
-            File.WriteAllBytes(ErpPath  + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
+            data = data.Replace("{Acumatica Source Directory}", SourcePath);
+            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
             data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n";
-            File.WriteAllBytes(ErpPath  + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
-            data=RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
+            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
+            data = RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
+            UpdateWebConfig();
+            if (string.IsNullOrWhiteSpace(txtSnapshot.Text))
+                CreateSnapshotRecord();
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
             MessageBox.Show("Install Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -193,7 +306,7 @@ namespace AcumaticaDeployer
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WriteOutput(ex.Message);
             }
@@ -238,7 +351,7 @@ namespace AcumaticaDeployer
                 case ConnectionState.Closed:
                     break;
                 case ConnectionState.Open:
-                        picStatus.Invoke(new Action(() => picStatus.Image = Properties.Resources.OK));
+                    picStatus.Invoke(new Action(() => picStatus.Image = Properties.Resources.OK));
                     break;
                 case ConnectionState.Connecting:
                     break;
@@ -261,7 +374,7 @@ namespace AcumaticaDeployer
                 case ConnectionState.Closed:
                     break;
                 case ConnectionState.Open:
-                    chkNewDB.Invoke(new Action(() => chkNewDB.Checked = false)) ;
+                    chkNewDB.Invoke(new Action(() => chkNewDB.Checked = false));
                     break;
                 case ConnectionState.Connecting:
                     break;
@@ -270,7 +383,7 @@ namespace AcumaticaDeployer
                 case ConnectionState.Fetching:
                     break;
                 case ConnectionState.Broken:
-                    chkNewDB.Invoke(new Action(() => chkNewDB.Checked = true)) ;
+                    chkNewDB.Invoke(new Action(() => chkNewDB.Checked = true));
                     break;
                 default:
                     chkNewDB.Invoke(new Action(() => chkNewDB.Checked = true));
@@ -310,7 +423,7 @@ namespace AcumaticaDeployer
                 Application.DoEvents();
             //string output = results.StandardOutput.ReadToEnd();
             //Debug.Print(output);
-            
+
             // catch error information
 
             //string errors = results.StandardError.ReadToEnd();
@@ -321,9 +434,9 @@ namespace AcumaticaDeployer
         private int GetProgress(string data)
         {
             var parse = data.Split(':');
-            if(parse[parse.Length-1].Contains("%"))
+            if (parse[parse.Length - 1].Contains("%"))
             {
-                var value= (int)decimal.Parse(parse[parse.Length-1].Split('%')[0]);
+                var value = (int)decimal.Parse(parse[parse.Length - 1].Split('%')[0]);
                 return value > 100 ? 100 : value;
             }
             return 0;
@@ -337,14 +450,14 @@ namespace AcumaticaDeployer
         private void WriteOutput(string outLine)
         {
             string line;
-                line = (outLine.Replace("\0", string.Empty));
-                Debug.WriteLine(line);
-                OutputLog += line + "\r\n";
-                var progress = GetProgress(line);
-                if (progress > 0)
-                    progressBar1.Invoke(new Action(() => progressBar1.Value = progress));
-                rtbLogs.Invoke(new Action(() => rtbLogs.AppendText(line + "\r\n")));
-                rtbLogs.Invoke(new Action(() => rtbLogs.ScrollToCaret()));
+            line = (outLine.Replace("\0", string.Empty));
+            Debug.WriteLine(line);
+            OutputLog += line + "\r\n";
+            var progress = GetProgress(line);
+            if (progress > 0)
+                progressBar1.Invoke(new Action(() => progressBar1.Value = progress));
+            rtbLogs.Invoke(new Action(() => rtbLogs.AppendText(line + "\r\n")));
+            rtbLogs.Invoke(new Action(() => rtbLogs.ScrollToCaret()));
         }
 
         private void BtnUpgrade_Click(object sender, EventArgs e)
@@ -362,9 +475,10 @@ namespace AcumaticaDeployer
             //"InstanceName=" + txtInstance.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\n";
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
             btnUnInstallCustom_Click(sender, e);
-            data=RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
+            data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
+            UpdateWebConfig();
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
             MessageBox.Show("Upgrade Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -395,8 +509,8 @@ namespace AcumaticaDeployer
         }
         private List<string> Instances()
         {
-            var key=Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Acumatica ERP");
-            var retVal= key?.GetSubKeyNames().ToList();
+            var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Acumatica ERP");
+            var retVal = key?.GetSubKeyNames().ToList();
             return retVal;
         }
 
@@ -424,10 +538,10 @@ namespace AcumaticaDeployer
         {
             get
             {
-                string retVal="";
+                string retVal = "";
                 Configuration config = webConfig();
                 if (config.AppSettings.Settings.AllKeys.Contains("Version"))
-                    retVal=config.AppSettings.Settings["Version"].Value;
+                    retVal = config.AppSettings.Settings["Version"].Value;
                 return retVal;
             }
         }
@@ -447,12 +561,12 @@ namespace AcumaticaDeployer
             try
             {
                 var cs = connectionString;
-                if(string.IsNullOrEmpty(cs))
+                if (string.IsNullOrEmpty(cs))
                 {
-                    txtDBName.Text ="";
+                    txtDBName.Text = "";
                     txtDBServer.Text = Settings.DefaultDBServer;
-                    txtDBUser.Text = Settings.DefaultDBUser ;
-                    txtDBPass.Text = Settings.DefaultDBPassword ;
+                    txtDBUser.Text = Settings.DefaultDBUser;
+                    txtDBPass.Text = Settings.DefaultDBPassword;
                 }
                 else
                 {
@@ -470,11 +584,11 @@ namespace AcumaticaDeployer
                 txtDBUser.Text = Settings.DefaultDBUser;
                 txtDBPass.Text = Settings.DefaultDBPassword;
             }
-                if(txtInstance.SelectedIndex>-1)
-                {
-                    chkPortal.Checked = File.Exists(ErpPath + @"\site\bin\SP.Objects.dll");
-                }
-                    
+            if (txtInstance.SelectedIndex > -1)
+            {
+                chkPortal.Checked = File.Exists(ErpPath + @"\site\bin\SP.Objects.dll");
+            }
+
         }
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)
@@ -498,15 +612,17 @@ namespace AcumaticaDeployer
                 foreach (string item in cboCustom.CheckedItems)
                 {
                     var fi = new FileInfo(item);
+                    File.Copy(item, ErpPath + @"\mods\" + fi.Name, true);
                     packages.Add(fi.Name);
                     client.UploadPackage(fi.Name, System.IO.File.ReadAllBytes(item), true);
                 }
                 IsPublishing = true;
-                client.PublishPackagesAsync(packages.ToArray(), true);
 
+                client.PublishPackagesAsync(packages.ToArray(), true);
                 while (IsPublishing)
                     Application.DoEvents();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 WriteOutput(ex.Message);
                 IsPublishing = false;
@@ -532,7 +648,7 @@ namespace AcumaticaDeployer
                 while (IsPublishing)
                     Application.DoEvents();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WriteOutput(ex.Message);
                 IsPublishing = false;
@@ -545,8 +661,8 @@ namespace AcumaticaDeployer
             if (pos.HasValue && pos.Value > 0)
             {
                 custompublishtext = e.Error.Message.Substring(pos.Value);
-                
-                
+
+
                 WriteOutput(custompublishtext);
             }
             else
@@ -563,11 +679,11 @@ namespace AcumaticaDeployer
             if (pos.HasValue && pos.Value > 0)
             {
                 custompublishtext = e.Error.Message.Substring(pos.Value);
-                WriteOutput( custompublishtext);
+                WriteOutput(custompublishtext);
             }
             else
             {
-                WriteOutput( "Publish Successful.");
+                WriteOutput("Publish Successful.");
             }
             IsPublishing = false;
 
@@ -597,20 +713,20 @@ namespace AcumaticaDeployer
                     catch { }
                 }
                 cts = new CancellationTokenSource();
-                 SQLTask= sqlConn.OpenAsync(cts.Token);
+                SQLTask = sqlConn.OpenAsync(cts.Token);
                 await SQLTask;
-                
+
                 //picStatus.Image = Properties.Resources.OK;
             }
-            catch(TaskCanceledException ex)
+            catch (TaskCanceledException ex)
             { }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (connectionSettings == SQLConnectionSettings.Database)
                     chkNewDB.Checked = true;
                 else
                 {
-                    System.Diagnostics.Debug.Print("TestSQLConnectionAsync:{0}",ex.Message);
+                    System.Diagnostics.Debug.Print("TestSQLConnectionAsync:{0}", ex.Message);
                     picStatus.Image = Properties.Resources.Err;
                 }
             }
@@ -630,7 +746,7 @@ namespace AcumaticaDeployer
         private async void txtDBServer_TextChangedAsync(object sender, EventArgs e)
         {
             await TestSQLConnectionAsync(SQLConnectionSettings.Server);
-            if(!string.IsNullOrWhiteSpace(txtDBName.Text))
+            if (!string.IsNullOrWhiteSpace(txtDBName.Text))
                 await TestSQLConnectionAsync(SQLConnectionSettings.Database);
         }
 
@@ -645,7 +761,7 @@ namespace AcumaticaDeployer
 
         private async void txtDBUser_TextChanged(object sender, EventArgs e)
         {
-            await TestSQLConnectionAsync(SQLConnectionSettings.Server );
+            await TestSQLConnectionAsync(SQLConnectionSettings.Server);
             if (!string.IsNullOrWhiteSpace(txtDBName.Text))
                 await TestSQLConnectionAsync(SQLConnectionSettings.Database);
 
@@ -662,6 +778,115 @@ namespace AcumaticaDeployer
         private void cboPatch_SelectedIndexChanged(object sender, EventArgs e)
         {
             txtInstance_TextChanged(sender, e);
+        }
+
+        private void btnSaveWebConfig_Click(object sender, EventArgs e)
+        {
+            UpdateWebConfig();
+        }
+
+        private void btnOFDSnaphot_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog
+            {
+                FileName = txtSnapshot.Text,
+                Title = "Select path for Snapshot file"
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+                txtSnapshot.Text = ofd.FileName;
+        }
+
+        private void txtSnapshot_TextChanged(object sender, EventArgs e)
+        {
+            if (File.Exists(txtSnapshot.Text))
+            {
+                PackageManifest gi = GetManifest(txtSnapshot.Text);
+                var item = Items.First(f => f.PatchVersion == gi.GeneralInfo.Version);
+                if (item != null)
+                {
+                    cboVersion.SelectedItem = item.Version;
+                    cboPatch.SelectedItem = item;
+                }
+
+            }
+        }
+
+        private PackageManifest GetManifest(string filename)
+        {
+            var zip = Ionic.Zip.ZipFile.Read(filename);
+            var manifest = zip.Entries.First(f => f.FileName == "Manifest.xml");
+            var reader = manifest.OpenReader();
+            var str = new StreamReader(reader);
+            var data = str.ReadToEnd();
+            var sr = new StringReader(data);
+            var ser = new System.Xml.Serialization.XmlSerializer(typeof(PackageManifest));
+
+            var gi = (PackageManifest)ser.Deserialize(sr);
+            return gi;
+        }
+        private void CreateSnapshotRecord()
+        {
+            WriteOutput("Staging Snapshot");
+            try
+            {
+                using (SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database))
+                {
+                    var id = Guid.NewGuid().ToString();
+                    var gi = GetManifest(txtSnapshot.Text)?.GeneralInfo;
+                    if (gi != null)
+                        sqlConn.Open();
+
+                    {
+                        var sqlCommand = new System.Data.SqlClient.SqlCommand("insert into UPSnapshot ( [CompanyID]" +
+      ",[SnapshotID]" +
+      ",[Date]" +
+      ",[Version]" +
+      ",[Host]" +
+      ",[Name]" +
+      ",[Description]" +
+      ",[ExportMode]" +
+      ",[Customization]" +
+      ",[MasterCompany]" +
+      ",[SourceCompany]" +
+      ",[LinkedCompany]" +
+      ",[CreatedByID]" +
+      ",[CreatedByScreenID]" +
+      ",[CreatedDateTime]" +
+      ",[LastModifiedByID]" +
+      ",[LastModifiedByScreenID]" +
+      ",[LastModifiedDateTime]" +
+      ",[DeletedDatabaseRecord]" +
+      ",[NoteID]" +
+      ",[IsSafe])" +
+      "select 2, '" + id + "', '" + gi.Date + "', '" + gi.Version + "', '" + gi.Host + "', '" + gi.Name + "', '" + gi.Description + "', '" + gi.ExportMode +
+      "', NULL,NULL,2,-100020001,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
+      DateTime.Now.ToString("yyyy-MM-dd") + "','D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
+      DateTime.Now.ToString("yyyy-MM-dd") + "',0,newid(),'" + gi.IsSafe +"'"
+      ,sqlConn) ;
+                        var result = sqlCommand.ExecuteNonQuery();
+                        if (result > 0)
+                        {
+                            File.Copy(txtSnapshot.Text, ErpPath + @"\ERP\Site\Snapshots\" + id + ".zip");
+                        }
+                    }
+                 WriteOutput("Snapshot saved as " + id + ".zip");
+               }
+            }
+            catch(Exception ex)
+            {
+                WriteOutput(ex.Message);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            CreateSnapshotRecord();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtSnapshot.Text))
+                CreateSnapshotRecord();
         }
     }
 }
