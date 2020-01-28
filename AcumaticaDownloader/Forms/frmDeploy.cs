@@ -121,7 +121,8 @@ namespace AcumaticaDeployer
                     case "compilation":
                         var element = (System.Web.Configuration.SystemWebSectionGroup)config.GetSectionGroup("system.web");//.ElementInformation("compilation");
                         var comp = element.Compilation;
-                        comp.GetType().GetProperty(item.Name).SetValue(comp, item.Value);
+
+                        comp.GetType().GetProperty(item.Name).SetValue(comp, MyConvert(item.Type, item.Value));
 
                         break;
                     default:
@@ -130,24 +131,36 @@ namespace AcumaticaDeployer
             }
             config.Save();
         }
+        private object MyConvert(string Type, string Value)
+        {
+            object retVal=null;
+            if(!string.IsNullOrWhiteSpace(Value))
+                retVal = Convert.ChangeType(Value, System.Type.GetType(Type));
+            return retVal;
+        }
         private DevOptions GetOptions()
         {
             var retVal = new DevOptions();
+            System.Diagnostics.Debug.WriteLine(OptionPanel.Controls.Count);
             foreach (Control control in OptionPanel.Controls)
             {
                 var type = control.GetType().ToString();
+                if (control.Tag != null)
+                    System.Diagnostics.Debug.WriteLine(type + ":" + string.Join(",",((string[])control.Tag)));
                 switch (type)
                 {
-                    case "CheckBox":
+                    case "System.Windows.Forms.CheckBox":
                         var chk = (CheckBox)control;
-                        var item = retVal.First(f => f.Name == chk.Text);
+                        var item = retVal.First(f => f.Name == ((string[])chk.Tag)[1]);
                         item.Value = chk.Checked.ToString();
+                        System.Diagnostics.Debug.WriteLine(item.Name + ":" + chk.Checked.ToString());
                         retVal.Add(item);
                         break;
-                    case "NumericUpDown":
+                    case "System.Windows.Forms.NumericUpDown":
                         //TODO: process box
                         break;
                     default:
+                        System.Diagnostics.Debug.WriteLine(control.Name + ":" + type + ":" + control.Tag?.ToString());
                         break;
                 }
             }
@@ -165,12 +178,12 @@ namespace AcumaticaDeployer
                 {
 
 
-                    case "boolean":
+                    case "System.Boolean":
                         var chk = new CheckBox()
                         {
                             Text = option.Label,
                             Checked = Boolean.Parse(option.Recommend),
-                            Tag = option.Area,
+                            Tag = new string[] { option.Area, option.Name },
                             AutoSize = true,
                             TextAlign = ContentAlignment.MiddleLeft
                         };
@@ -182,11 +195,11 @@ namespace AcumaticaDeployer
                         OptionPanel.SetRow(chk, row);
                         OptionPanel.SetColumn(chk, 1);
                         break;
-                    case "int":
+                    case "System.Int32":
                         var num = new NumericUpDown()
                         {
                             Value = int.Parse(option.Recommend),
-                            Tag = option.Area,
+                            Tag = new string[] { option.Area, option.Name },
                             AutoSize = true,
                         };
                         toolTip1.SetToolTip(num, option.Desc);
@@ -256,7 +269,7 @@ namespace AcumaticaDeployer
         {
             if (!SelectedVersion.Cached)
             {
-                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion));
+                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion),true);
                 Utils.DownloadFile(SelectedVersion, OutputHandler);
 
             }
@@ -447,12 +460,18 @@ namespace AcumaticaDeployer
                 WriteOutput(outLine.Data);
         }
 
-        private void WriteOutput(string outLine)
+        private void WriteOutput(string outLine, bool header=false)
         {
-            string line;
-            line = (outLine.Replace("\0", string.Empty));
+
+            string line="";
+            if (header)
+                line += new string('=', 20) + "\r\n";
+            line += (outLine.Replace("\0", string.Empty)) + "\r\n";
+            if (header)
+                line += new string('=', 20);
             Debug.WriteLine(line);
             OutputLog += line + "\r\n";
+
             var progress = GetProgress(line);
             if (progress > 0)
                 progressBar1.Invoke(new Action(() => progressBar1.Value = progress));
@@ -598,7 +617,7 @@ namespace AcumaticaDeployer
         private bool IsPublishing;
         private void btnInstallCustom_Click(object sender, EventArgs e)
         {
-            WriteOutput("Publishing Packages");
+            WriteOutput("Publishing Packages",true);
             try
             {
                 ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
@@ -627,12 +646,13 @@ namespace AcumaticaDeployer
                 WriteOutput(ex.Message);
                 IsPublishing = false;
             }
+            WriteOutput("Publishing Packages Complete", true);
         }
         private void btnUnInstallCustom_Click(object sender, EventArgs e)
         {
             try
             {
-                WriteOutput("Unpublishing Packages");
+                WriteOutput("Unpublishing Packages",true);
                 ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
                 {
                     CookieContainer = new System.Net.CookieContainer()
@@ -647,6 +667,7 @@ namespace AcumaticaDeployer
 
                 while (IsPublishing)
                     Application.DoEvents();
+                WriteOutput("Unpublishing Packages Complete", true);
             }
             catch (Exception ex)
             {
@@ -664,10 +685,11 @@ namespace AcumaticaDeployer
 
 
                 WriteOutput(custompublishtext);
+                WriteOutput("Unpublish Unsuccessful.", true);
             }
             else
             {
-                WriteOutput("Unpublish Successful.");
+                WriteOutput("Unpublish Successful.",true);
             }
             IsPublishing = false;
         }
@@ -679,11 +701,13 @@ namespace AcumaticaDeployer
             if (pos.HasValue && pos.Value > 0)
             {
                 custompublishtext = e.Error.Message.Substring(pos.Value);
+                WriteOutput("Publish Error Log:", true);
                 WriteOutput(custompublishtext);
+                WriteOutput("Publish Unsuccessful.", true);
             }
             else
             {
-                WriteOutput("Publish Successful.");
+                WriteOutput("Publish Successful.",true);
             }
             IsPublishing = false;
 
@@ -826,7 +850,7 @@ namespace AcumaticaDeployer
         }
         private void CreateSnapshotRecord()
         {
-            WriteOutput("Staging Snapshot");
+            WriteOutput("Staging Snapshot",true);
             try
             {
                 using (SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database))
@@ -837,39 +861,24 @@ namespace AcumaticaDeployer
                         sqlConn.Open();
 
                     {
-                        var sqlCommand = new System.Data.SqlClient.SqlCommand("insert into UPSnapshot ( [CompanyID]" +
-      ",[SnapshotID]" +
-      ",[Date]" +
-      ",[Version]" +
-      ",[Host]" +
-      ",[Name]" +
-      ",[Description]" +
-      ",[ExportMode]" +
-      ",[Customization]" +
-      ",[MasterCompany]" +
-      ",[SourceCompany]" +
-      ",[LinkedCompany]" +
-      ",[CreatedByID]" +
-      ",[CreatedByScreenID]" +
-      ",[CreatedDateTime]" +
-      ",[LastModifiedByID]" +
-      ",[LastModifiedByScreenID]" +
-      ",[LastModifiedDateTime]" +
-      ",[DeletedDatabaseRecord]" +
-      ",[NoteID]" +
-      ",[IsSafe])" +
-      "select 2, '" + id + "', '" + gi.Date + "', '" + gi.Version + "', '" + gi.Host + "', '" + gi.Name + "', '" + gi.Description + "', '" + gi.ExportMode +
-      "', NULL,NULL,2,-100020001,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
-      DateTime.Now.ToString("yyyy-MM-dd") + "','D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
-      DateTime.Now.ToString("yyyy-MM-dd") + "',0,newid(),'" + gi.IsSafe +"'"
-      ,sqlConn) ;
+                        var sqlCommand = new System.Data.SqlClient.SqlCommand("insert into UPSnapshot ( [CompanyID],[SnapshotID], [Date]" +
+                                                                              ",[Version],[Host],[Name],[Description],[ExportMode],[Customization]" +
+                                                                              ",[MasterCompany],[SourceCompany],[LinkedCompany],[CreatedByID],[CreatedByScreenID]" +
+                                                                              ",[CreatedDateTime],[LastModifiedByID],[LastModifiedByScreenID],[LastModifiedDateTime]" +
+                                                                              ",[DeletedDatabaseRecord],[NoteID],[IsSafe])" +
+                                                                              "select 2, '" + id + "', '" + gi.Date + "', '" + gi.Version + "', '" + 
+                                                                              gi.Host + "', '" + gi.Name + "', '" + gi.Description + "', '" + gi.ExportMode +
+                                                                              "', NULL,NULL,2,-100020001,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
+                                                                              DateTime.Now.ToString("yyyy-MM-dd") + "','D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
+                                                                              DateTime.Now.ToString("yyyy-MM-dd") + "',0,newid(),'" + gi.IsSafe +"'"
+                        ,sqlConn) ;
                         var result = sqlCommand.ExecuteNonQuery();
                         if (result > 0)
                         {
                             File.Copy(txtSnapshot.Text, ErpPath + @"\ERP\Site\Snapshots\" + id + ".zip");
                         }
                     }
-                 WriteOutput("Snapshot saved as " + id + ".zip");
+                 WriteOutput("Snapshot saved as " + id + ".zip",true);
                }
             }
             catch(Exception ex)
