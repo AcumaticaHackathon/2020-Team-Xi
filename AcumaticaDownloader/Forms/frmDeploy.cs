@@ -1,4 +1,5 @@
-﻿using AcumaticaDeployer.ServiceGate;
+﻿using AcumaticaDeployer.Objects;
+using AcumaticaDeployer.ServiceGate;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,7 @@ namespace AcumaticaDeployer
     public partial class frmDeploy : Form
     {
         private const string Title = "Acumatica Deployer";
+        private Instance instance;
         private DownloadItemList Items { get { return Utils.Items; } }
 
         public frmDeploy()
@@ -99,49 +101,8 @@ namespace AcumaticaDeployer
             }
         }
 
-        private void UpdateWebConfig()
-        {
-            var config = webConfig();
-            foreach (var item in GetOptions())
-            {
-                switch (item.Area)
-                {
-                    case "AppSettings":
-                        try
-                        {
-                            if (config.AppSettings.Settings.AllKeys.Contains(item.Name))
-                                config.AppSettings.Settings[item.Name].Value = item.Value;
-                            else
-                                config.AppSettings.Settings.Add(item.Name, item.Value);
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine(ex.Message);
-                        }
-                        break;
 
-                    case "compilation":
-                        var element = (System.Web.Configuration.SystemWebSectionGroup)config.GetSectionGroup("system.web");//.ElementInformation("compilation");
-                        var comp = element.Compilation;
-
-                        comp.GetType().GetProperty(item.Name).SetValue(comp, MyConvert(item.Type, item.Value));
-
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            config.Save();
-        }
-
-        private object MyConvert(string Type, string Value)
-        {
-            object retVal = null;
-            if (!string.IsNullOrWhiteSpace(Value))
-                retVal = Convert.ChangeType(Value, System.Type.GetType(Type));
-            return retVal;
-        }
+       
 
         private DevOptions GetOptions()
         {
@@ -243,7 +204,7 @@ namespace AcumaticaDeployer
                 chkDemoData.Checked = false;
                 chkNewDB.Checked = false;
                 btnInstall.Enabled = false;
-                if (cboPatch.SelectedIndex > -1 && !string.IsNullOrWhiteSpace(siteVersion) && Version.Parse(((DownloadItem)cboPatch.SelectedItem).PatchVersion) >= Version.Parse(siteVersion))
+                if (cboPatch.SelectedIndex > -1 && !string.IsNullOrWhiteSpace(instance.siteVersion) && Version.Parse(((DownloadItem)cboPatch.SelectedItem).PatchVersion) >= Version.Parse(instance.siteVersion))
                     btnUpgrade.Enabled = true;
                 else
                     btnUpgrade.Enabled = false;
@@ -301,7 +262,7 @@ namespace AcumaticaDeployer
             data = RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
-            UpdateWebConfig();
+            instance.UpdateWebConfig(GetOptions());
             if (string.IsNullOrWhiteSpace(txtSnapshot.Text))
                 CreateSnapshotRecord();
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
@@ -342,7 +303,7 @@ namespace AcumaticaDeployer
 
         private SqlConnection CreateSQLConnection(SQLConnectionSettings connectionSettings)
         {
-            var sb = new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString)
+            var sb = new System.Data.SqlClient.SqlConnectionStringBuilder(instance.connectionString)
             {
                 DataSource = txtDBServer.Text
             };
@@ -517,7 +478,7 @@ namespace AcumaticaDeployer
             data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
-            UpdateWebConfig();
+            instance.UpdateWebConfig(GetOptions());
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
             MessageBox.Show("Upgrade Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -557,50 +518,16 @@ namespace AcumaticaDeployer
             Items.RefreshData();
         }
 
-        private string connectionString
-        {
-            get
-            {
-                Configuration config = webConfig();
-                var test = config.ConnectionStrings.ConnectionStrings.GetEnumerator();
-                while (test.Current == null || ((ConnectionStringSettings)test.Current)?.Name != "ProjectX")
-                    if (!test.MoveNext())
-                        break;
-                ConnectionStringSettings item = (ConnectionStringSettings)test.Current;
-                if (item.Name != "ProjectX")
-                    return "";
-                else
-                    return item.ConnectionString;
-            }
-        }
 
-        private string siteVersion
-        {
-            get
-            {
-                string retVal = "";
-                Configuration config = webConfig();
-                if (config.AppSettings.Settings.AllKeys.Contains("Version"))
-                    retVal = config.AppSettings.Settings["Version"].Value;
-                return retVal;
-            }
-        }
-
-        private Configuration webConfig()
-        {
-            var configFile = new FileInfo(ErpPath + @"\site\web.config");
-            var vdm = new VirtualDirectoryMapping(configFile.DirectoryName, true, configFile.Name);
-            var wcfm = new WebConfigurationFileMap();
-            wcfm.VirtualDirectories.Add("/", vdm);
-            var config = WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
-            return config;
-        }
 
         private void txtInstance_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
-                var cs = connectionString;
+                if (instance == null)
+                    instance = new Instance();
+                instance.Name = txtInstance.Text;
+                var cs = instance.connectionString;
                 if (string.IsNullOrEmpty(cs))
                 {
                     txtDBName.Text = "";
@@ -826,7 +753,7 @@ namespace AcumaticaDeployer
 
         private void btnSaveWebConfig_Click(object sender, EventArgs e)
         {
-            UpdateWebConfig();
+            instance.UpdateWebConfig(GetOptions());
         }
 
         private void btnOFDSnaphot_Click(object sender, EventArgs e)

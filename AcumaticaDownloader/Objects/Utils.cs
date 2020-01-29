@@ -193,6 +193,13 @@ namespace AcumaticaDeployer
                 return retVal.ToArray();
             }
         }
+        public static object MyConvert(string Type, string Value)
+        {
+            object retVal = null;
+            if (!string.IsNullOrWhiteSpace(Value))
+                retVal = Convert.ChangeType(Value, System.Type.GetType(Type));
+            return retVal;
+        }
     }
 
     public static class StringExt

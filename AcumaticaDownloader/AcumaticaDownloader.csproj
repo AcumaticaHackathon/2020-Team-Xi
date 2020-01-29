@@ -91,6 +91,7 @@
     <Compile Include="Forms\frmProgress.Designer.cs">
       <DependentUpon>frmProgress.cs</DependentUpon>
     </Compile>
+    <Compile Include="Objects\Instance.cs" />
     <Compile Include="Objects\Manifest.cs" />
     <Compile Include="Objects\Contents.cs" />
     <Compile Include="Objects\DownloadItem.cs" />
