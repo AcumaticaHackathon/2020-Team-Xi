@@ -21,16 +21,12 @@ namespace AcumaticaDeployer
     public partial class frmDeploy : Form
     {
         private const string Title = "Acumatica Deployer";
-        //private Settings Settings;
         private DownloadItemList Items { get { return Utils.Items; } }
         public frmDeploy()
         {
             InitializeComponent();
             Utils.DownloadCompleted += DownloadComplete;
             Utils.DownloadProgressChanged += DownloadProgress;
-
-            //Settings = new Settings();
-            //Items = DownloadItemList.GetList();
 
         }
         private void DownloadProgress(object sender, DownloadProgressChangedEventArgs e)
@@ -41,7 +37,6 @@ namespace AcumaticaDeployer
         {
             Utils.downloading = false;
         }
-        //private bool downloading;
         private void FrmDeploy_Load(object sender, EventArgs e)
         {
             try
@@ -133,8 +128,8 @@ namespace AcumaticaDeployer
         }
         private object MyConvert(string Type, string Value)
         {
-            object retVal=null;
-            if(!string.IsNullOrWhiteSpace(Value))
+            object retVal = null;
+            if (!string.IsNullOrWhiteSpace(Value))
                 retVal = Convert.ChangeType(Value, System.Type.GetType(Type));
             return retVal;
         }
@@ -146,18 +141,23 @@ namespace AcumaticaDeployer
             {
                 var type = control.GetType().ToString();
                 if (control.Tag != null)
-                    System.Diagnostics.Debug.WriteLine(type + ":" + string.Join(",",((string[])control.Tag)));
+                    System.Diagnostics.Debug.WriteLine(type + ":" + string.Join(",", ((string[])control.Tag)));
+                DevOption item;
                 switch (type)
                 {
                     case "System.Windows.Forms.CheckBox":
                         var chk = (CheckBox)control;
-                        var item = retVal.First(f => f.Name == ((string[])chk.Tag)[1]);
+                        item = retVal.First(f => f.Name == ((string[])chk.Tag)[1]);
                         item.Value = chk.Checked.ToString();
                         System.Diagnostics.Debug.WriteLine(item.Name + ":" + chk.Checked.ToString());
                         retVal.Add(item);
                         break;
                     case "System.Windows.Forms.NumericUpDown":
-                        //TODO: process box
+                        var num = (NumericUpDown)control;
+                        item = retVal.First(f => f.Name == ((string[])num.Tag)[1]);
+                        item.Value = num.Value.ToString();
+                        System.Diagnostics.Debug.WriteLine(item.Name + ":" + num.Value.ToString());
+                        retVal.Add(item);
                         break;
                     default:
                         System.Diagnostics.Debug.WriteLine(control.Name + ":" + type + ":" + control.Tag?.ToString());
@@ -244,10 +244,6 @@ namespace AcumaticaDeployer
                 chkNewDB.Enabled = true;
                 btnInstall.Enabled = true;
                 btnUpgrade.Enabled = false;
-
-                //chkDemoData.Checked = false;
-                //chkNewDB.Checked = true;
-
             }
         }
         private string AppPath()
@@ -269,7 +265,7 @@ namespace AcumaticaDeployer
         {
             if (!SelectedVersion.Cached)
             {
-                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion),true);
+                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion), true);
                 Utils.DownloadFile(SelectedVersion, OutputHandler);
 
             }
@@ -302,7 +298,9 @@ namespace AcumaticaDeployer
                 using (SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database))
                 {
                     sqlConn.Open();
-                    var sqlCommand = new System.Data.SqlClient.SqlCommand("update users set username='" + txtACUser.Text + "', password='" + txtACPass.Text + "', PasswordChangeOnNextLogin=0 where companyid=2 and username='" + txtACUser.Text + "'", sqlConn);
+                    var sqlCommand = new System.Data.SqlClient.SqlCommand("update users set username=@username, password=@password, PasswordChangeOnNextLogin=0 where companyid=2 and username=@username", sqlConn);
+                    sqlCommand.Parameters.AddWithValue("@username",txtACUser.Text);
+                    sqlCommand.Parameters.AddWithValue("@password", txtACPass.Text);
                     if (sqlCommand.ExecuteNonQuery() == 0)
                     {
                         sqlCommand.CommandText = "insert into users (CompanyID, PKID, Username, ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, Password, PasswordChangeable, PasswordChangeOnNextLogin," +
@@ -310,7 +308,7 @@ namespace AcumaticaDeployer
                                    "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
                                    "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, NoteID, MultiFactorType, " +
                                    "MultiFactorOverride, AllowedSessions)" +
-                                   "Select CompanyID, newid() as pkid, '" + txtACUser.Text + "' as username , ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, '" + txtACPass.Text + "' as password, PasswordChangeable, 0 as PasswordChangeOnNextLogin," +
+                                   "Select CompanyID, newid() as pkid, @username as username , ExtRef, Source, FirstName, LastName, FullName, ApplicationName, Email, Phone, Comment, LoginTypeID, @password as password, PasswordChangeable, 0 as PasswordChangeOnNextLogin," +
                                    "PasswordNeverExpires, AllowPasswordRecovery, PasswordQuestion, PasswordAnswer, IsApproved, IsPendingActivation, IsHidden, Guest, LastActivityDate, LastLoginDate, LastPasswordChangedDate, CreationDate, IsOnLine, " +
                                    "IsAssigned, OverrideADRoles, LastHostName, LockedOutDate, LastLockedOutDate, FailedPasswordAttemptCount, FailedPasswordAttemptWindowStart, FailedPasswordAnswerAttemptCount, " +
                                    "FailedPasswordAnswerAttemptWindowStart, GroupMask, GuidForPasswordRecovery, PasswordRecoveryExpirationDate, DeletedDatabaseRecord, CompanyMask, PseudonymizationStatus, newid() as noteid, MultiFactorType, " +
@@ -409,7 +407,6 @@ namespace AcumaticaDeployer
         private string RunScript(string ps1File, string version)
         {
             OutputLog = "";
-            //var ps1File = Settings.PathToInstalls + @"ProcessAcumaticaInstaller.ps1";
             string retVal;
             var startInfo = new ProcessStartInfo()
             {
@@ -434,13 +431,6 @@ namespace AcumaticaDeployer
             results.BeginErrorReadLine();
             while (!results.HasExited)
                 Application.DoEvents();
-            //string output = results.StandardOutput.ReadToEnd();
-            //Debug.Print(output);
-
-            // catch error information
-
-            //string errors = results.StandardError.ReadToEnd();
-            //Debug.Print(errors);
             retVal = OutputLog;
             return retVal;
         }
@@ -460,10 +450,10 @@ namespace AcumaticaDeployer
                 WriteOutput(outLine.Data);
         }
 
-        private void WriteOutput(string outLine, bool header=false)
+        private void WriteOutput(string outLine, bool header = false)
         {
 
-            string line="";
+            string line = "";
             if (header)
                 line += new string('=', 20) + "\r\n";
             line += (outLine.Replace("\0", string.Empty)) + "\r\n";
@@ -491,7 +481,6 @@ namespace AcumaticaDeployer
             data = data.Replace("{Acumatica Source Directory}", SourcePath);
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
             data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n";
-            //"InstanceName=" + txtInstance.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\n";
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
             btnUnInstallCustom_Click(sender, e);
             data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
@@ -516,8 +505,6 @@ namespace AcumaticaDeployer
             var frm = new frmSettings();
             if (frm.ShowDialog() == DialogResult.OK)
             {
-                //ConfigurationManager.RefreshSection("applicationSettings");
-                //Settings = new Settings();
                 FrmDeploy_Load(this, new EventArgs());
             }
         }
@@ -617,7 +604,7 @@ namespace AcumaticaDeployer
         private bool IsPublishing;
         private void btnInstallCustom_Click(object sender, EventArgs e)
         {
-            WriteOutput("Publishing Packages",true);
+            WriteOutput("Publishing Packages", true);
             try
             {
                 ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
@@ -652,7 +639,7 @@ namespace AcumaticaDeployer
         {
             try
             {
-                WriteOutput("Unpublishing Packages",true);
+                WriteOutput("Unpublishing Packages", true);
                 ServiceGate.ServiceGate client = new ServiceGate.ServiceGate
                 {
                     CookieContainer = new System.Net.CookieContainer()
@@ -689,7 +676,7 @@ namespace AcumaticaDeployer
             }
             else
             {
-                WriteOutput("Unpublish Successful.",true);
+                WriteOutput("Unpublish Successful.", true);
             }
             IsPublishing = false;
         }
@@ -707,7 +694,7 @@ namespace AcumaticaDeployer
             }
             else
             {
-                WriteOutput("Publish Successful.",true);
+                WriteOutput("Publish Successful.", true);
             }
             IsPublishing = false;
 
@@ -739,11 +726,9 @@ namespace AcumaticaDeployer
                 cts = new CancellationTokenSource();
                 SQLTask = sqlConn.OpenAsync(cts.Token);
                 await SQLTask;
-
-                //picStatus.Image = Properties.Resources.OK;
             }
             catch (TaskCanceledException ex)
-            { }
+            { System.Diagnostics.Debug.WriteLine(ex.Message); }
             catch (Exception ex)
             {
                 if (connectionSettings == SQLConnectionSettings.Database)
@@ -780,7 +765,6 @@ namespace AcumaticaDeployer
 
             if (!string.IsNullOrWhiteSpace(txtDBName.Text))
                 await TestSQLConnectionAsync(SQLConnectionSettings.Database);
-            //chkNewDB.Checked = (picStatus.Image == Properties.Resources.Err);
         }
 
         private async void txtDBUser_TextChanged(object sender, EventArgs e)
@@ -850,7 +834,7 @@ namespace AcumaticaDeployer
         }
         private void CreateSnapshotRecord()
         {
-            WriteOutput("Staging Snapshot",true);
+            WriteOutput("Staging Snapshot", true);
             try
             {
                 using (SqlConnection sqlConn = CreateSQLConnection(SQLConnectionSettings.Database))
@@ -866,22 +850,30 @@ namespace AcumaticaDeployer
                                                                               ",[MasterCompany],[SourceCompany],[LinkedCompany],[CreatedByID],[CreatedByScreenID]" +
                                                                               ",[CreatedDateTime],[LastModifiedByID],[LastModifiedByScreenID],[LastModifiedDateTime]" +
                                                                               ",[DeletedDatabaseRecord],[NoteID],[IsSafe])" +
-                                                                              "select 2, '" + id + "', '" + gi.Date + "', '" + gi.Version + "', '" + 
-                                                                              gi.Host + "', '" + gi.Name + "', '" + gi.Description + "', '" + gi.ExportMode +
-                                                                              "', NULL,NULL,2,-100020001,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
-                                                                              DateTime.Now.ToString("yyyy-MM-dd") + "','D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520','" + 
-                                                                              DateTime.Now.ToString("yyyy-MM-dd") + "',0,newid(),'" + gi.IsSafe +"'"
-                        ,sqlConn) ;
+                                                                              "select 2, @id, @date, @version, @host, @name, @desc, @export," +
+                                                                              "NULL,NULL,2,-100020001,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520'," +
+                                                                              "@auditdate,'D2BCFE36-7938-4737-957B-CA648CEB88D0','SM203520'," +
+                                                                              "@auditdate,0,newid(),@issafe"
+                        , sqlConn);
+                        sqlCommand.Parameters.AddWithValue("@id", id);
+                        sqlCommand.Parameters.AddWithValue("@date", gi.Date);
+                        sqlCommand.Parameters.AddWithValue("@version", gi.Version);
+                        sqlCommand.Parameters.AddWithValue("@host", gi.Host);
+                        sqlCommand.Parameters.AddWithValue("@name", gi.Name);
+                        sqlCommand.Parameters.AddWithValue("@desc", gi.Description);
+                        sqlCommand.Parameters.AddWithValue("@export", gi.ExportMode);
+                        sqlCommand.Parameters.AddWithValue("@issafe", gi.IsSafe);
+                        sqlCommand.Parameters.AddWithValue("@auditdate", DateTime.Now);
                         var result = sqlCommand.ExecuteNonQuery();
                         if (result > 0)
                         {
                             File.Copy(txtSnapshot.Text, ErpPath + @"\ERP\Site\Snapshots\" + id + ".zip");
                         }
                     }
-                 WriteOutput("Snapshot saved as " + id + ".zip",true);
-               }
+                    WriteOutput("Snapshot saved as " + id + ".zip", true);
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WriteOutput(ex.Message);
             }
