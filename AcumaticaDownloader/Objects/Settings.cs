@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AcumaticaDeployer
@@ -12,12 +8,14 @@ namespace AcumaticaDeployer
     public static class Settings
     {
         private static Configuration config;
+
         private static void InitSettings()
         {
             if (!File.Exists(Application.StartupPath + @"\settings."))
                 File.Create(Application.StartupPath + @"\settings.");
             config = ConfigurationManager.OpenExeConfiguration(Application.StartupPath + @"\settings.");
         }
+
         public static string AcumaticaS3Url
         {
             get
@@ -47,6 +45,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string DefaultDBUser
         {
             get
@@ -76,6 +75,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string DefaultDBServer
         {
             get
@@ -105,6 +105,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string CustomizationPath
         {
             get
@@ -135,7 +136,6 @@ namespace AcumaticaDeployer
             }
         }
 
-
         public static string DefaultDBPassword
         {
             get
@@ -165,6 +165,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string PathToInstalls
         {
             get
@@ -194,6 +195,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string DefaultAcumaticaPassword
         {
             get
@@ -223,6 +225,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string DefaultAcumaticaAdmin
         {
             get
@@ -252,6 +255,7 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         public static string PathToAcumatica
         {
             get
@@ -288,7 +292,5 @@ namespace AcumaticaDeployer
                 InitSettings();
             config.Save(ConfigurationSaveMode.Minimal, true);
         }
-
-
     }
 }

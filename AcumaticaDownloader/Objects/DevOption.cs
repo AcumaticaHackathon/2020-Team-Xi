@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace AcumaticaDeployer
 {
@@ -12,6 +8,7 @@ namespace AcumaticaDeployer
         {
             Area = "AppSettings";
         }
+
         public string Name { get; set; }
         public string Type { get; set; }
         public string Desc { get; set; }
@@ -20,6 +17,7 @@ namespace AcumaticaDeployer
         public string Value { get; set; }
         public string Label { get; set; }
     }
+
     public class DevOptions : List<DevOption>
     {
         public DevOptions()
@@ -32,7 +30,6 @@ namespace AcumaticaDeployer
                 Desc = "An indicator of whether an information about the current automation step (state of a form of Acumatica ERP) is displayed on the form. If you set the value of the key to true, the text box with the current automation state is displayed on the Info area of a form of Acumatica ERP.",
                 Type = "System.Boolean",
                 Recommend="False"
-
             },
             new DevOption()
             {
@@ -41,7 +38,6 @@ namespace AcumaticaDeployer
                 Desc = "If the key is True, the platform checks compatibility of the code included in a customization project with the original application code every time while publishing the project. If there are any compatibility errors, the platform displays the warning and error messages in the сompilation window and breaks the publication process.",
                 Type = "System.Boolean",
                 Recommend="True"
-
             },
             new DevOption()
             {

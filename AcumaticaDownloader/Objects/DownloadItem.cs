@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace AcumaticaDeployer
 {
@@ -25,6 +21,7 @@ namespace AcumaticaDeployer
                 return new Version();
             }
         }
+
         public string PatchVersion
         {
             get
@@ -32,6 +29,7 @@ namespace AcumaticaDeployer
                 return Utils.GetVersion(this);
             }
         }
+
         public string Version
         {
             get
@@ -39,15 +37,17 @@ namespace AcumaticaDeployer
                 return Utils.GetVersion2(Utils.GetVersion(this));
             }
         }
+
         public string Filename { get; set; }
-        public bool Preview 
-        { 
-            get 
+
+        public bool Preview
+        {
+            get
             {
                 return Filename.ToLower().Contains("preview") || Filename.ToLower().Contains("beta");
-                
             }
         }
+
         public bool Cached
         {
             get
@@ -55,8 +55,10 @@ namespace AcumaticaDeployer
                 return Utils.CheckFile(Filename, Settings.PathToInstalls);
             }
         }
+
         public bool Downloaded { get; set; }
         public bool InProgress { get; set; }
+
         public string Label
         {
             get
@@ -64,11 +66,13 @@ namespace AcumaticaDeployer
                 return PatchVersion + (Preview ? " Preview" : "") + (Cached ? " - Cached" : "");
             }
         }
+
         public override string ToString()
         {
             return Filename + (Downloaded ? " - Done" : (InProgress ? " - Processing" : ""));
         }
     }
+
     [Serializable]
     public class DownloadItemList : BindingList<DownloadItem>
     {
@@ -103,16 +107,19 @@ namespace AcumaticaDeployer
                 }
             }
         }
+
         private void OnDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
         {
             Utils.downloading = true;
             // DownloadProgress(sender, e);
         }
+
         private void OnDownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
             Utils.downloading = false;
             //DownloadComplete.Invoke(sender, e);
         }
+
         //private bool downloading;
         private DownloadItemList()
         {
@@ -121,8 +128,8 @@ namespace AcumaticaDeployer
             Utils.DownloadProgressChanged += OnDownloadProgress;
             //hasLoaded = false;
             url = Settings.AcumaticaS3Url;
-
         }
+
         private string fileName
         {
             get
@@ -130,14 +137,15 @@ namespace AcumaticaDeployer
                 return Settings.PathToInstalls + @"Cache.xml";
             }
         }
+
         private void SaveFile()
         {
-
             var ser = new System.Xml.Serialization.XmlSerializer(typeof(DownloadItemList));
             var ms = new System.IO.MemoryStream();
             ser.Serialize(ms, this);
             System.IO.File.WriteAllBytes(fileName, ms.ToArray());
         }
+
         private static DownloadItemList LoadFile()
         {
             if (System.IO.File.Exists(Settings.PathToInstalls + @"Cache.xml"))
@@ -149,16 +157,17 @@ namespace AcumaticaDeployer
             }
             return null;
         }
+
         public void RefreshData()
         {
             Items.Clear();
             var boolTruncated = true;
-                Utils.Progress.ProgressMessage = "Refreshing Versions";
+            Utils.Progress.ProgressMessage = "Refreshing Versions";
             Utils.Progress.ProgressValue = 0;
-                if (!Utils.Progress.Visible)
-                     Utils.Progress.Show();
+            if (!Utils.Progress.Visible)
+                Utils.Progress.Show();
             Application.DoEvents();
-           while (boolTruncated)
+            while (boolTruncated)
             {
                 var batch = Utils.GetResults(url);
                 Application.DoEvents();
@@ -169,7 +178,7 @@ namespace AcumaticaDeployer
                 Application.DoEvents();
                 foreach (var item in results)
                 {
-                    Utils.Progress.ProgressValue = results.IndexOf(item)+1;
+                    Utils.Progress.ProgressValue = results.IndexOf(item) + 1;
                     Utils.Progress.ProgressValue -= 1;
                     Utils.Progress.ProgressValue += 1;
                     System.Diagnostics.Debug.WriteLine(Utils.Progress.ProgressValue);
@@ -187,16 +196,16 @@ namespace AcumaticaDeployer
                             //{
                             //    dl.AppVersion = ver;
                             //}
-                            if( dl.PatchVersion.Replace(".","").IsNumeric())
-                            if (item.Key.ToLower().Contains("preview") || item.Key.ToLower().Contains("beta"))
-                            {
-                            //    dl.Preview = true;
-                                Items.Add(dl);
-                            }
-                            else if (!(item.Key.ToLower().Contains("hotfix") || item.Key.ToLower().Contains("recalled") || item.Key.ToLower().Contains("rejected") || item.Key.ToLower().Contains("hidden")))
-                            {
-                                Items.Add(dl);
-                            }
+                            if (dl.PatchVersion.Replace(".", "").IsNumeric())
+                                if (item.Key.ToLower().Contains("preview") || item.Key.ToLower().Contains("beta"))
+                                {
+                                    //    dl.Preview = true;
+                                    Items.Add(dl);
+                                }
+                                else if (!(item.Key.ToLower().Contains("hotfix") || item.Key.ToLower().Contains("recalled") || item.Key.ToLower().Contains("rejected") || item.Key.ToLower().Contains("hidden")))
+                                {
+                                    Items.Add(dl);
+                                }
                         }
                     }
                     catch { }
@@ -215,5 +224,4 @@ namespace AcumaticaDeployer
             url = Settings.AcumaticaS3Url;
         }
     }
-
 }

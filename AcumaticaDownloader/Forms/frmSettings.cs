@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AcumaticaDeployer
@@ -22,11 +14,11 @@ namespace AcumaticaDeployer
             txtInstallPath.Text = Settings.PathToInstalls;
             txtRootPath.Text = Settings.PathToAcumatica;
             txtDBUser.Text = Settings.DefaultDBUser;
-            txtDBServer.Text=Settings.DefaultDBServer  ;
-            txtDBPassword.Text=Settings.DefaultDBPassword ;
-            txtCustomizationPath.Text=Settings.CustomizationPath ;
-            txtACUser.Text=Settings.DefaultAcumaticaAdmin;
-            txtACPass.Text=Settings.DefaultAcumaticaPassword ;
+            txtDBServer.Text = Settings.DefaultDBServer;
+            txtDBPassword.Text = Settings.DefaultDBPassword;
+            txtCustomizationPath.Text = Settings.CustomizationPath;
+            txtACUser.Text = Settings.DefaultAcumaticaAdmin;
+            txtACPass.Text = Settings.DefaultAcumaticaPassword;
         }
 
         private void TxtAcumaticaURL_TextChanged(object sender, EventArgs e)
@@ -47,7 +39,7 @@ namespace AcumaticaDeployer
         {
             Settings.AcumaticaS3Url = txtAcumaticaURL.Text;
             Settings.PathToInstalls = txtInstallPath.Text + (txtInstallPath.Text.EndsWith("\\") ? "" : "\\");
-            Settings.PathToAcumatica = txtRootPath.Text + (txtRootPath.Text.EndsWith("\\")?"":"\\");
+            Settings.PathToAcumatica = txtRootPath.Text + (txtRootPath.Text.EndsWith("\\") ? "" : "\\");
             Settings.DefaultDBUser = txtDBUser.Text;
             Settings.DefaultDBServer = txtDBServer.Text;
             Settings.DefaultDBPassword = txtDBPassword.Text;
@@ -89,12 +81,10 @@ namespace AcumaticaDeployer
             };
             if (ofd.ShowDialog() == DialogResult.OK)
                 txtCustomizationPath.Text = ofd.SelectedPath;
-
         }
 
         private void frmSettings_Load(object sender, EventArgs e)
         {
-
         }
     }
 }

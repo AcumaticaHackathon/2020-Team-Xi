@@ -64,19 +64,18 @@
             this.txtACPass = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnOFDSnaphot = new System.Windows.Forms.Button();
+            this.txtSnapshot = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.chkPreview = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.picStatus = new System.Windows.Forms.PictureBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.OptionPanel = new System.Windows.Forms.TableLayoutPanel();
             this.btnUpdateUser = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnSaveWebConfig = new System.Windows.Forms.Button();
-            this.OptionPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtSnapshot = new System.Windows.Forms.TextBox();
-            this.btnOFDSnaphot = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -103,7 +102,7 @@
             this.label1.Location = new System.Drawing.Point(20, 81);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(95, 17);
+            this.label1.Size = new System.Drawing.Size(91, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "Major Version";
             // 
@@ -136,7 +135,7 @@
             this.label2.Location = new System.Drawing.Point(20, 114);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(82, 17);
+            this.label2.Size = new System.Drawing.Size(78, 16);
             this.label2.TabIndex = 3;
             this.label2.Text = "Patch Level";
             // 
@@ -155,7 +154,7 @@
             this.label3.Location = new System.Drawing.Point(21, 57);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(68, 17);
+            this.label3.Size = new System.Drawing.Size(67, 16);
             this.label3.TabIndex = 8;
             this.label3.Text = "DB Name";
             // 
@@ -165,7 +164,7 @@
             this.label4.Location = new System.Drawing.Point(20, 47);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(102, 17);
+            this.label4.Size = new System.Drawing.Size(98, 16);
             this.label4.TabIndex = 7;
             this.label4.Text = "Instance Name";
             // 
@@ -175,7 +174,7 @@
             this.chkNewDB.Location = new System.Drawing.Point(135, 148);
             this.chkNewDB.Margin = new System.Windows.Forms.Padding(4);
             this.chkNewDB.Name = "chkNewDB";
-            this.chkNewDB.Size = new System.Drawing.Size(80, 21);
+            this.chkNewDB.Size = new System.Drawing.Size(76, 20);
             this.chkNewDB.TabIndex = 14;
             this.chkNewDB.Text = "New DB";
             this.chkNewDB.UseVisualStyleBackColor = true;
@@ -186,7 +185,7 @@
             this.chkDemoData.Location = new System.Drawing.Point(247, 148);
             this.chkDemoData.Margin = new System.Windows.Forms.Padding(4);
             this.chkDemoData.Name = "chkDemoData";
-            this.chkDemoData.Size = new System.Drawing.Size(101, 21);
+            this.chkDemoData.Size = new System.Drawing.Size(96, 20);
             this.chkDemoData.TabIndex = 15;
             this.chkDemoData.Text = "Demo Data";
             this.chkDemoData.UseVisualStyleBackColor = true;
@@ -218,10 +217,10 @@
             // progressBar1
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(0, 530);
+            this.progressBar1.Location = new System.Drawing.Point(0, 533);
             this.progressBar1.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(842, 28);
+            this.progressBar1.Size = new System.Drawing.Size(844, 28);
             this.progressBar1.TabIndex = 13;
             // 
             // rtbLogs
@@ -243,7 +242,7 @@
             this.chkPortal.Location = new System.Drawing.Point(20, 12);
             this.chkPortal.Margin = new System.Windows.Forms.Padding(4);
             this.chkPortal.Name = "chkPortal";
-            this.chkPortal.Size = new System.Drawing.Size(67, 21);
+            this.chkPortal.Size = new System.Drawing.Size(62, 20);
             this.chkPortal.TabIndex = 5;
             this.chkPortal.Text = "Portal";
             this.chkPortal.UseVisualStyleBackColor = true;
@@ -266,7 +265,7 @@
             this.lblMessage.Location = new System.Drawing.Point(197, 533);
             this.lblMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(0, 17);
+            this.lblMessage.Size = new System.Drawing.Size(0, 16);
             this.lblMessage.TabIndex = 17;
             // 
             // txtInstance
@@ -298,7 +297,7 @@
             this.label5.Location = new System.Drawing.Point(21, 25);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(73, 17);
+            this.label5.Size = new System.Drawing.Size(70, 16);
             this.label5.TabIndex = 22;
             this.label5.Text = "DB Server";
             // 
@@ -317,7 +316,7 @@
             this.label6.Location = new System.Drawing.Point(21, 89);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(61, 17);
+            this.label6.Size = new System.Drawing.Size(59, 16);
             this.label6.TabIndex = 26;
             this.label6.Text = "DB User";
             // 
@@ -336,7 +335,7 @@
             this.label7.Location = new System.Drawing.Point(21, 121);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(62, 17);
+            this.label7.Size = new System.Drawing.Size(61, 16);
             this.label7.TabIndex = 24;
             this.label7.Text = "DB Pass";
             // 
@@ -355,7 +354,7 @@
             this.label8.Location = new System.Drawing.Point(20, 80);
             this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(103, 17);
+            this.label8.Size = new System.Drawing.Size(98, 16);
             this.label8.TabIndex = 27;
             this.label8.Text = "Customizations";
             // 
@@ -391,7 +390,7 @@
             this.label9.Location = new System.Drawing.Point(20, 113);
             this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(107, 17);
+            this.label9.Size = new System.Drawing.Size(103, 16);
             this.label9.TabIndex = 33;
             this.label9.Text = "Acumatica User";
             // 
@@ -409,7 +408,7 @@
             this.label10.Location = new System.Drawing.Point(20, 145);
             this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(108, 17);
+            this.label10.Size = new System.Drawing.Size(105, 16);
             this.label10.TabIndex = 31;
             this.label10.Text = "Acumatica Pass";
             // 
@@ -436,7 +435,6 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.btnOFDSnaphot);
             this.tabPage1.Controls.Add(this.txtSnapshot);
             this.tabPage1.Controls.Add(this.label11);
@@ -454,13 +452,42 @@
             this.tabPage1.Text = "Select Version";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // btnOFDSnaphot
+            // 
+            this.btnOFDSnaphot.Location = new System.Drawing.Point(544, 14);
+            this.btnOFDSnaphot.Margin = new System.Windows.Forms.Padding(4);
+            this.btnOFDSnaphot.Name = "btnOFDSnaphot";
+            this.btnOFDSnaphot.Size = new System.Drawing.Size(37, 28);
+            this.btnOFDSnaphot.TabIndex = 9;
+            this.btnOFDSnaphot.Text = "...";
+            this.btnOFDSnaphot.UseVisualStyleBackColor = true;
+            this.btnOFDSnaphot.Click += new System.EventHandler(this.btnOFDSnaphot_Click);
+            // 
+            // txtSnapshot
+            // 
+            this.txtSnapshot.Location = new System.Drawing.Point(180, 17);
+            this.txtSnapshot.Name = "txtSnapshot";
+            this.txtSnapshot.Size = new System.Drawing.Size(357, 22);
+            this.txtSnapshot.TabIndex = 8;
+            this.txtSnapshot.TextChanged += new System.EventHandler(this.txtSnapshot_TextChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(20, 20);
+            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(149, 16);
+            this.label11.TabIndex = 5;
+            this.label11.Text = "Snapshot File (optional)";
+            // 
             // chkPreview
             // 
             this.chkPreview.AutoSize = true;
             this.chkPreview.Location = new System.Drawing.Point(23, 51);
             this.chkPreview.Margin = new System.Windows.Forms.Padding(4);
             this.chkPreview.Name = "chkPreview";
-            this.chkPreview.Size = new System.Drawing.Size(128, 21);
+            this.chkPreview.Size = new System.Drawing.Size(121, 20);
             this.chkPreview.TabIndex = 2;
             this.chkPreview.Text = "Include Preview";
             this.chkPreview.UseVisualStyleBackColor = true;
@@ -530,6 +557,22 @@
             this.tabPage4.Text = "Dev Options";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
+            // OptionPanel
+            // 
+            this.OptionPanel.AutoScroll = true;
+            this.OptionPanel.AutoSize = true;
+            this.OptionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.OptionPanel.ColumnCount = 2;
+            this.OptionPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30.80495F));
+            this.OptionPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 69.19505F));
+            this.OptionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.OptionPanel.Location = new System.Drawing.Point(3, 3);
+            this.OptionPanel.Name = "OptionPanel";
+            this.OptionPanel.RowCount = 1;
+            this.OptionPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.OptionPanel.Size = new System.Drawing.Size(646, 275);
+            this.OptionPanel.TabIndex = 0;
+            // 
             // btnUpdateUser
             // 
             this.btnUpdateUser.Location = new System.Drawing.Point(682, 212);
@@ -552,67 +595,11 @@
             this.btnSaveWebConfig.UseVisualStyleBackColor = true;
             this.btnSaveWebConfig.Click += new System.EventHandler(this.btnSaveWebConfig_Click);
             // 
-            // OptionPanel
-            // 
-            this.OptionPanel.AutoScroll = true;
-            this.OptionPanel.AutoSize = true;
-            this.OptionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.OptionPanel.ColumnCount = 2;
-            this.OptionPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30.80495F));
-            this.OptionPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 69.19505F));
-            this.OptionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OptionPanel.Location = new System.Drawing.Point(3, 3);
-            this.OptionPanel.Name = "OptionPanel";
-            this.OptionPanel.RowCount = 1;
-            this.OptionPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.OptionPanel.Size = new System.Drawing.Size(646, 275);
-            this.OptionPanel.TabIndex = 0;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(20, 20);
-            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(158, 17);
-            this.label11.TabIndex = 5;
-            this.label11.Text = "Snapshot File (optional)";
-            // 
-            // txtSnapshot
-            // 
-            this.txtSnapshot.Location = new System.Drawing.Point(180, 17);
-            this.txtSnapshot.Name = "txtSnapshot";
-            this.txtSnapshot.Size = new System.Drawing.Size(357, 22);
-            this.txtSnapshot.TabIndex = 8;
-            this.txtSnapshot.TextChanged += new System.EventHandler(this.txtSnapshot_TextChanged);
-            // 
-            // btnOFDSnaphot
-            // 
-            this.btnOFDSnaphot.Location = new System.Drawing.Point(544, 14);
-            this.btnOFDSnaphot.Margin = new System.Windows.Forms.Padding(4);
-            this.btnOFDSnaphot.Name = "btnOFDSnaphot";
-            this.btnOFDSnaphot.Size = new System.Drawing.Size(37, 28);
-            this.btnOFDSnaphot.TabIndex = 9;
-            this.btnOFDSnaphot.Text = "...";
-            this.btnOFDSnaphot.UseVisualStyleBackColor = true;
-            this.btnOFDSnaphot.Click += new System.EventHandler(this.btnOFDSnaphot_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(589, 14);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(37, 28);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "...";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
-            // 
             // frmDeploy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(842, 558);
+            this.ClientSize = new System.Drawing.Size(844, 561);
             this.Controls.Add(this.btnSaveWebConfig);
             this.Controls.Add(this.btnUpdateUser);
             this.Controls.Add(this.tabControl1);
@@ -695,6 +682,5 @@
         private System.Windows.Forms.TextBox txtSnapshot;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnOFDSnaphot;
-        private System.Windows.Forms.Button button1;
     }
 }
