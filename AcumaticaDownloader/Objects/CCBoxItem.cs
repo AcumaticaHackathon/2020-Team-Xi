@@ -1,4 +1,4 @@
-namespace CheckComboBoxTest
+namespace CheckComboBox
 {
     public class CCBoxItem
     {

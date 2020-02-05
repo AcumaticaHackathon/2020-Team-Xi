@@ -1,4 +1,4 @@
-﻿using CheckComboBoxTest;
+﻿using CheckComboBox;
 using Equin.ApplicationFramework;
 using System;
 using System.ComponentModel;

@@ -204,6 +204,8 @@ namespace AcumaticaDeployer
                 chkDemoData.Checked = false;
                 chkNewDB.Checked = false;
                 btnInstall.Enabled = false;
+                btnSaveWebConfig.Enabled = true;
+                btnCustom.Enabled = true;
                 if (cboPatch.SelectedIndex > -1 && !string.IsNullOrWhiteSpace(instance.siteVersion) && Version.Parse(((DownloadItem)cboPatch.SelectedItem).PatchVersion) >= Version.Parse(instance.siteVersion))
                     btnUpgrade.Enabled = true;
                 else
@@ -219,6 +221,8 @@ namespace AcumaticaDeployer
                 chkNewDB.Enabled = true;
                 btnInstall.Enabled = true;
                 btnUpgrade.Enabled = false;
+                btnSaveWebConfig.Enabled = false;
+                btnCustom.Enabled = false;
             }
         }
 
@@ -257,12 +261,21 @@ namespace AcumaticaDeployer
             var data = File.ReadAllText(AppPath() + @"\Scripts\CreateNewSite.ps1");
             data = data.Replace("{Acumatica Source Directory}", SourcePath);
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
-            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n";
+            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n" + "IntegratedSecurity=" + chkIntegratedSecurity.Checked.ToString() + "\r\n";
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
             data = RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
+            instance.Name = txtInstance.Text;
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
-            instance.UpdateWebConfig(GetOptions());
+            try
+            {
+                WriteOutput("Update Web.Config",true);
+                instance.UpdateWebConfig(GetOptions());
+            }
+            catch ( Exception ex)
+            {
+                WriteOutput(ex.Message);
+            }
             if (string.IsNullOrWhiteSpace(txtSnapshot.Text))
                 CreateSnapshotRecord();
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
@@ -315,9 +328,12 @@ namespace AcumaticaDeployer
             {
                 sb.InitialCatalog = "";
             }
-            sb.IntegratedSecurity = false;
-            sb.UserID = txtDBUser.Text;
-            sb.Password = txtDBPass.Text;
+            sb.IntegratedSecurity = chkIntegratedSecurity.Checked;
+            if (!chkIntegratedSecurity.Checked)
+            {
+                sb.UserID = txtDBUser.Text;
+                sb.Password = txtDBPass.Text;
+            }
             System.Data.SqlClient.SqlConnection sqlConn = new System.Data.SqlClient.SqlConnection(sb.ConnectionString);
             if (connectionSettings == SQLConnectionSettings.Database)
             {
@@ -463,6 +479,11 @@ namespace AcumaticaDeployer
 
         private void BtnUpgrade_Click(object sender, EventArgs e)
         {
+            if (!SelectedVersion.Cached)
+            {
+                WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion), true);
+                Utils.DownloadFile(SelectedVersion, OutputHandler);
+            }
             if (!Directory.Exists(ErpPath))
                 Directory.CreateDirectory(ErpPath);
             if (!Directory.Exists(ErpPath + @"\Scripts"))
@@ -476,9 +497,19 @@ namespace AcumaticaDeployer
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
             btnUnInstallCustom_Click(sender, e);
             data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
+            instance.Name = txtInstance.Text;
             BtnUpdateUser_Click(sender, e);
             btnInstallCustom_Click(sender, e);
-            instance.UpdateWebConfig(GetOptions());
+            //instance.UpdateWebConfig(GetOptions());
+            try
+            {
+                WriteOutput("Update Web.Config", true);
+                instance.UpdateWebConfig(GetOptions());
+            }
+            catch (Exception ex)
+            {
+                WriteOutput(ex.Message);
+            }
             File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
             MessageBox.Show("Upgrade Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -518,12 +549,13 @@ namespace AcumaticaDeployer
             Items.RefreshData();
         }
 
+        private bool dbSetup = false;
 
-
-        private void txtInstance_SelectedIndexChanged(object sender, EventArgs e)
+        private async void txtInstance_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
+                dbSetup = true;
                 if (instance == null)
                     instance = new Instance();
                 instance.Name = txtInstance.Text;
@@ -534,6 +566,7 @@ namespace AcumaticaDeployer
                     txtDBServer.Text = Settings.DefaultDBServer;
                     txtDBUser.Text = Settings.DefaultDBUser;
                     txtDBPass.Text = Settings.DefaultDBPassword;
+                    chkIntegratedSecurity.Checked = false;
                 }
                 else
                 {
@@ -541,6 +574,9 @@ namespace AcumaticaDeployer
                     txtDBServer.Text = cs.Split(';').FirstOrDefault(s => s.ToLower().Contains("data source"))?.Split('=').Last();
                     txtDBUser.Text = cs.Split(';').FirstOrDefault(s => s.ToLower().Contains("user"))?.Split('=').Last();
                     txtDBPass.Text = cs.Split(';').FirstOrDefault(s => s.ToLower().Contains("password"))?.Split('=').Last();
+                    bool boolValue = false;
+                    bool.TryParse(cs.Split(';').FirstOrDefault(s => s.ToLower().Contains("integrated"))?.Split('=').Last(), out boolValue);
+                    chkIntegratedSecurity.Checked = boolValue;
                 }
             }
             catch
@@ -549,11 +585,16 @@ namespace AcumaticaDeployer
                 txtDBServer.Text = Settings.DefaultDBServer;
                 txtDBUser.Text = Settings.DefaultDBUser;
                 txtDBPass.Text = Settings.DefaultDBPassword;
+                chkIntegratedSecurity.Checked = false;
             }
             if (txtInstance.SelectedIndex > -1)
             {
                 chkPortal.Checked = File.Exists(ErpPath + @"\site\bin\SP.Objects.dll");
             }
+            dbSetup = false;
+            await TestSQLConnectionAsync(SQLConnectionSettings.Server);
+            if (!string.IsNullOrWhiteSpace(txtDBName.Text))
+                await TestSQLConnectionAsync(SQLConnectionSettings.Database);
         }
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)
@@ -726,24 +767,35 @@ namespace AcumaticaDeployer
 
         private async void txtDBName_TextChanged(object sender, EventArgs e)
         {
-            await TestSQLConnectionAsync(SQLConnectionSettings.Server);
+            if (!dbSetup)
+            {
+                await TestSQLConnectionAsync(SQLConnectionSettings.Server);
 
-            if (!string.IsNullOrWhiteSpace(txtDBName.Text))
-                await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+                if (!string.IsNullOrWhiteSpace(txtDBName.Text))
+                    await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            }
         }
 
         private async void txtDBUser_TextChanged(object sender, EventArgs e)
         {
-            await TestSQLConnectionAsync(SQLConnectionSettings.Server);
-            if (!string.IsNullOrWhiteSpace(txtDBName.Text))
-                await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            if (!dbSetup)
+            {
+
+                await TestSQLConnectionAsync(SQLConnectionSettings.Server);
+                if (!string.IsNullOrWhiteSpace(txtDBName.Text))
+                    await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            }
         }
 
         private async void txtDBPass_TextChanged(object sender, EventArgs e)
         {
-            await TestSQLConnectionAsync(SQLConnectionSettings.Server);
-            if (!string.IsNullOrWhiteSpace(txtDBName.Text))
-                await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            if (!dbSetup)
+            {
+
+                await TestSQLConnectionAsync(SQLConnectionSettings.Server);
+                if (!string.IsNullOrWhiteSpace(txtDBName.Text))
+                    await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            }
         }
 
         private void cboPatch_SelectedIndexChanged(object sender, EventArgs e)
@@ -842,15 +894,15 @@ namespace AcumaticaDeployer
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void chkIntegratedSecurity_CheckedChangedAsync(object sender, EventArgs e)
         {
-            CreateSnapshotRecord();
-        }
+            if (!dbSetup)
+            {
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(txtSnapshot.Text))
-                CreateSnapshotRecord();
+                await TestSQLConnectionAsync(SQLConnectionSettings.Server);
+                if (!string.IsNullOrWhiteSpace(txtDBName.Text))
+                    await TestSQLConnectionAsync(SQLConnectionSettings.Database);
+            }
         }
     }
 }

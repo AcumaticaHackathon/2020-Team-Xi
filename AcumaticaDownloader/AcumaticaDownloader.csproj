@@ -55,15 +55,15 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\acumatica.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>AcumaticaDeployer.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.13.5.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.13.5\lib\net40\DotNetZip.dll</HintPath>
     </Reference>
     <Reference Include="Equin.ApplicationFramework.BindingListView, Version=1.4.5222.35545, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Equin.ApplicationFramework.BindingListView.1.4.5222.35545\lib\net40-Client\Equin.ApplicationFramework.BindingListView.dll</HintPath>
-    </Reference>
-    <Reference Include="PX.Web.Customization">
-      <HintPath>..\..\..\Acumatica ERP\Test19R2\Site\Bin\PX.Web.Customization.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -84,6 +84,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\CCBoxItem.cs" />
+    <Compile Include="Objects\CheckedComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Objects\DevOption.cs" />
     <Compile Include="Forms\frmProgress.cs">
       <SubType>Form</SubType>
@@ -205,12 +209,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\acumatica.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CheckedComboBox\CheckComboBoxTest.csproj">
-      <Project>{04ba4fd3-12a1-4e0b-adc2-c898edfb1016}</Project>
-      <Name>CheckComboBoxTest</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace CheckComboBoxTest
+namespace CheckComboBox
 {
     public class CheckedComboBox : ComboBox
     {
@@ -264,8 +264,7 @@ namespace CheckComboBoxTest
             {
                 Debug.WriteLine("OnDeactivate");
                 base.OnDeactivate(e);
-                CCBoxEventArgs ce = e as CCBoxEventArgs;
-                if (ce != null)
+                if (e is CCBoxEventArgs ce)
                 {
                     CloseDropdown(ce.AssignValues);
                 }

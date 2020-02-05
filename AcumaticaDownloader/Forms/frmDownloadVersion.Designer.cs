@@ -1,4 +1,4 @@
-﻿using CheckComboBoxTest;
+﻿using CheckComboBox;
 using System;
 
 namespace AcumaticaDeployer
@@ -42,7 +42,7 @@ namespace AcumaticaDeployer
             this.chkPreview = new System.Windows.Forms.CheckBox();
             this.btnCheckAll = new System.Windows.Forms.Button();
             this.btnInfo = new System.Windows.Forms.Button();
-            this.cmbVersion = new CheckComboBoxTest.CheckedComboBox();
+            this.cmbVersion = new CheckComboBox.CheckedComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();

@@ -36,6 +36,7 @@ $erpPath = Join-Path $scriptBranchRoot 'ERP'
 #paramter file parameters (setting defaults before file value)
 $script:paramInstanceName = ("DEV{0}" -f $scriptBranchName)
 $script:paramDatabaseName = ("DEV{0}" -f $scriptBranchName)
+[bool]$script:paramDatabaseSecurity = $false
 [bool]$script:paramIsNewDatabase = $true
 [bool]$script:paramInsertDemoData = $true
 $script:paramAcumaticaERPInstallDirectory = "{Acumatica Source Directory}"
@@ -70,6 +71,7 @@ function Create-ParameterFile ()
         $buffer += ("DatabaseName={0}" -f $dbName)
         $buffer += ("DatabaseUser={0}" -f $dbUser)
         $buffer += ("DatabasePass={0}" -f $dbPass)
+		$buffer += ("IntegratedSecurity={0}" -f $dbSec)
         $buffer += ("IsNewDatabase={0}" -f $paramIsNewDatabase)
         $buffer += ("InsertDemoData={0}" -f $paramInsertDemoData)
         $buffer += ("AcumaticaERPInstallDirectory={0}" -f $paramAcumaticaERPInstallDirectory)
@@ -121,6 +123,7 @@ function Set-Parameter($pKey, $pValue)
         "DatabaseUser" { $script:paramDatabaseUser = $pValue; break}
         "DatabasePass" { $script:paramDatabasePass = $pValue; break}
         "DatabaseServer" { $script:paramDatabaseServer = $pValue; break}
+		"IntegratedSecurity" { $script:paramDatabaseSecurity = Get-ParameterBoolValue $pValue; break}
         "IsNewDatabase" { $script:paramIsNewDatabase =  Get-ParameterBoolValue $pValue; break}
         "InsertDemoData" { $script:paramInsertDemoData = Get-ParameterBoolValue $pValue; break}
         "AcumaticaERPInstallDirectory" { $script:paramAcumaticaERPInstallDirectory = $pValue; break}
@@ -401,7 +404,7 @@ Function CleanupWebConfig($sitePath, $erpPath)
     $xml.Save($webConfigPath)
 }
 
-function Create-AcumaticaSite([string]$siteVirtualDirectoryName,[string]$databaseServer ,[string]$databaseName, [bool]$isNewDb, [bool]$insertDemoData, [bool]$isPortal, [string]$acuSitePath, [string]$commandToolDir,[string]$databaseUser,[string]$databasePass)
+function Create-AcumaticaSite([string]$siteVirtualDirectoryName,[string]$databaseServer ,[string]$databaseName, [bool]$isNewDb, [bool]$insertDemoData, [bool]$isPortal, [string]$acuSitePath, [string]$commandToolDir,[string]$databaseUser,[string]$databasePass, [string]$databaseSecurity)
 {
     Write-Host " "
     Write-Host "========================================================================================================================" -foregroundcolor $script:writeHostColor
@@ -421,7 +424,7 @@ function Create-AcumaticaSite([string]$siteVirtualDirectoryName,[string]$databas
 
     $configMode = '-configmode:"NewInstance"'
     $dbNew = ('-dbnew:"{0}"' -f $isNewDb)
-    $dbWinAuth = '-dbsrvwinauth:"False"'
+    $dbWinAuth = ('-dbsrvwinauth:"{0}"' -f $databaseSecurity)
     $dbServerName = ('-dbsrvname:"{0}"' -f $databaseServer)
     $dbNewUser = '-dbnewuser:"False"'
     $dbUser = ('-dbuser:"{0}"' -f $databaseUser)
@@ -429,7 +432,7 @@ function Create-AcumaticaSite([string]$siteVirtualDirectoryName,[string]$databas
     $dbSrvUser = ('-dbsrvuser:"{0}"' -f $databaseUser)
     $dbSrvPass = ('-dbsrvpass:"{0}"' -f $databasePass)
     $dbName = ('-dbname:"{0}"' -f $databaseName)
-    $dbConnWinAuth = '-dbwinauth:"False"'
+    $dbConnWinAuth = ('-dbwinauth:"{0}"' -f $databaseSecurity)
     $localWebsite = '-swebsite:"Default Web Site"'
     $portalSite = ('-portal:{0}' -f $isPortal)
     $sitePath = ('-ipath:"{0}"' -f $acuSitePath)
@@ -521,7 +524,7 @@ Try
 
     [bool]$isPortal = $script:paramIsPortal
     
-    Create-AcumaticaSite $paramInstanceName $paramDatabaseServer $paramDatabaseName $paramIsNewDatabase $paramInsertDemoData $isPortal $sitePath $commandToolPath $paramDatabaseUser $paramDatabasePass
+    Create-AcumaticaSite $paramInstanceName $paramDatabaseServer $paramDatabaseName $paramIsNewDatabase $paramInsertDemoData $isPortal $sitePath $commandToolPath $paramDatabaseUser $paramDatabasePass $paramDatabaseSecurity
 
     CleanupWebConfig $sitePath $erpPath
 }
