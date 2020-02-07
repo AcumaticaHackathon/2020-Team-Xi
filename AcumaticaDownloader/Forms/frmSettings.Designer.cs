@@ -166,6 +166,7 @@
             // 
             this.txtDBPassword.Location = new System.Drawing.Point(201, 145);
             this.txtDBPassword.Name = "txtDBPassword";
+            this.txtDBPassword.PasswordChar = '*';
             this.txtDBPassword.Size = new System.Drawing.Size(210, 20);
             this.txtDBPassword.TabIndex = 16;
             // 
@@ -244,6 +245,7 @@
             // 
             this.txtACPass.Location = new System.Drawing.Point(201, 224);
             this.txtACPass.Name = "txtACPass";
+            this.txtACPass.PasswordChar = '*';
             this.txtACPass.Size = new System.Drawing.Size(210, 20);
             this.txtACPass.TabIndex = 23;
             // 

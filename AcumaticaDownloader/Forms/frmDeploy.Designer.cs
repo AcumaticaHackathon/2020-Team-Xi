@@ -68,7 +68,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.chkPreview = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.cboCustom = new CheckComboBox.CheckedComboBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.chkIntegratedSecurity = new System.Windows.Forms.CheckBox();
             this.picStatus = new System.Windows.Forms.PictureBox();
@@ -77,6 +76,8 @@
             this.btnUpdateUser = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnSaveWebConfig = new System.Windows.Forms.Button();
+            this.cboCustom = new CheckComboBox.CheckedComboBox();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -320,6 +321,7 @@
             // 
             this.txtDBPass.Location = new System.Drawing.Point(135, 84);
             this.txtDBPass.Name = "txtDBPass";
+            this.txtDBPass.PasswordChar = '*';
             this.txtDBPass.Size = new System.Drawing.Size(229, 20);
             this.txtDBPass.TabIndex = 13;
             this.txtDBPass.TextChanged += new System.EventHandler(this.txtDBPass_TextChanged);
@@ -373,6 +375,7 @@
             // 
             this.txtACPass.Location = new System.Drawing.Point(135, 87);
             this.txtACPass.Name = "txtACPass";
+            this.txtACPass.PasswordChar = '*';
             this.txtACPass.Size = new System.Drawing.Size(269, 20);
             this.txtACPass.TabIndex = 9;
             // 
@@ -463,20 +466,6 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Instance Info";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // cboCustom
-            // 
-            this.cboCustom.CheckOnClick = true;
-            this.cboCustom.DisplayMember = "Name";
-            this.cboCustom.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cboCustom.DropDownHeight = 1;
-            this.cboCustom.FormattingEnabled = true;
-            this.cboCustom.IntegralHeight = false;
-            this.cboCustom.Location = new System.Drawing.Point(135, 33);
-            this.cboCustom.Name = "cboCustom";
-            this.cboCustom.Size = new System.Drawing.Size(269, 21);
-            this.cboCustom.TabIndex = 7;
-            this.cboCustom.ValueSeparator = ", ";
             // 
             // tabPage3
             // 
@@ -572,11 +561,36 @@
             this.btnSaveWebConfig.UseVisualStyleBackColor = true;
             this.btnSaveWebConfig.Click += new System.EventHandler(this.btnSaveWebConfig_Click);
             // 
+            // cboCustom
+            // 
+            this.cboCustom.CheckOnClick = true;
+            this.cboCustom.DisplayMember = "Name";
+            this.cboCustom.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cboCustom.DropDownHeight = 1;
+            this.cboCustom.FormattingEnabled = true;
+            this.cboCustom.IntegralHeight = false;
+            this.cboCustom.Location = new System.Drawing.Point(135, 33);
+            this.cboCustom.Name = "cboCustom";
+            this.cboCustom.Size = new System.Drawing.Size(269, 21);
+            this.cboCustom.TabIndex = 7;
+            this.cboCustom.ValueSeparator = ", ";
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(9, 406);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(87, 13);
+            this.linkLabel1.TabIndex = 24;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Launch Instance";
+            // 
             // frmDeploy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(633, 456);
+            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.btnSaveWebConfig);
             this.Controls.Add(this.btnUpdateUser);
             this.Controls.Add(this.tabControl1);
@@ -659,5 +673,6 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnOFDSnaphot;
         private System.Windows.Forms.CheckBox chkIntegratedSecurity;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }
