@@ -1,4 +1,4 @@
-﻿namespace AcumaticaDeployer
+﻿namespace AcuDevDeployer
 {
     partial class frmDeploy
     {
@@ -68,6 +68,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.chkPreview = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnCustRefresh = new System.Windows.Forms.Button();
+            this.cboCustom = new CheckComboBox.CheckedComboBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.chkIntegratedSecurity = new System.Windows.Forms.CheckBox();
             this.picStatus = new System.Windows.Forms.PictureBox();
@@ -76,7 +78,6 @@
             this.btnUpdateUser = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnSaveWebConfig = new System.Windows.Forms.Button();
-            this.cboCustom = new CheckComboBox.CheckedComboBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -390,6 +391,7 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(495, 252);
             this.tabControl1.TabIndex = 1;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -450,6 +452,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btnCustRefresh);
             this.tabPage2.Controls.Add(this.txtInstance);
             this.tabPage2.Controls.Add(this.label9);
             this.tabPage2.Controls.Add(this.label4);
@@ -466,6 +469,31 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Instance Info";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnCustRefresh
+            // 
+            this.btnCustRefresh.BackgroundImage = global::AcuDevDeployer.Properties.Resources.Refresh_32x;
+            this.btnCustRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnCustRefresh.Location = new System.Drawing.Point(409, 32);
+            this.btnCustRefresh.Name = "btnCustRefresh";
+            this.btnCustRefresh.Size = new System.Drawing.Size(28, 23);
+            this.btnCustRefresh.TabIndex = 34;
+            this.btnCustRefresh.UseVisualStyleBackColor = true;
+            this.btnCustRefresh.Click += new System.EventHandler(this.btnCustRefresh_Click);
+            // 
+            // cboCustom
+            // 
+            this.cboCustom.CheckOnClick = true;
+            this.cboCustom.DisplayMember = "Name";
+            this.cboCustom.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cboCustom.DropDownHeight = 1;
+            this.cboCustom.FormattingEnabled = true;
+            this.cboCustom.IntegralHeight = false;
+            this.cboCustom.Location = new System.Drawing.Point(135, 33);
+            this.cboCustom.Name = "cboCustom";
+            this.cboCustom.Size = new System.Drawing.Size(269, 21);
+            this.cboCustom.TabIndex = 7;
+            this.cboCustom.ValueSeparator = ", ";
             // 
             // tabPage3
             // 
@@ -561,22 +589,9 @@
             this.btnSaveWebConfig.UseVisualStyleBackColor = true;
             this.btnSaveWebConfig.Click += new System.EventHandler(this.btnSaveWebConfig_Click);
             // 
-            // cboCustom
-            // 
-            this.cboCustom.CheckOnClick = true;
-            this.cboCustom.DisplayMember = "Name";
-            this.cboCustom.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cboCustom.DropDownHeight = 1;
-            this.cboCustom.FormattingEnabled = true;
-            this.cboCustom.IntegralHeight = false;
-            this.cboCustom.Location = new System.Drawing.Point(135, 33);
-            this.cboCustom.Name = "cboCustom";
-            this.cboCustom.Size = new System.Drawing.Size(269, 21);
-            this.cboCustom.TabIndex = 7;
-            this.cboCustom.ValueSeparator = ", ";
-            // 
             // linkLabel1
             // 
+            this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.Location = new System.Drawing.Point(9, 406);
             this.linkLabel1.Name = "linkLabel1";
@@ -584,6 +599,7 @@
             this.linkLabel1.TabIndex = 24;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "Launch Instance";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // frmDeploy
             // 
@@ -674,5 +690,6 @@
         private System.Windows.Forms.Button btnOFDSnaphot;
         private System.Windows.Forms.CheckBox chkIntegratedSecurity;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Button btnCustRefresh;
     }
 }

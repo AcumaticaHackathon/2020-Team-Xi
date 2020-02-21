@@ -1,4 +1,4 @@
-﻿namespace AcumaticaDeployer
+﻿namespace AcuDevDeployer
 {
     partial class frmProgress
     {

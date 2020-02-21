@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     public partial class frmDownloadVersion : Form
     {
@@ -42,8 +42,8 @@ namespace AcumaticaDeployer
             {
                 cmbVersion.Items.Add(new CCBoxItem() { Name = item });
             }
-            cmbVersion.SetCheckedItems(AcumaticaDeployer.Properties.Settings.Default.VersionFilter);
-            chkPreview.Checked = AcumaticaDeployer.Properties.Settings.Default.IncludePreview;
+            cmbVersion.SetCheckedItems(AcuDevDeployer.Properties.Settings.Default.VersionFilter);
+            chkPreview.Checked = AcuDevDeployer.Properties.Settings.Default.IncludePreview;
             Filter_Changed(sender, e);
             bs.ResetBindings(false);
         }
@@ -92,8 +92,7 @@ namespace AcumaticaDeployer
                     Utils.downloading = true;
                     CurrentItem.InProgress = true;
                     bs.ResetBindings(false);
-                    Utils.DownloadFile(item, OutputHandler);
-                    CurrentItem.Downloaded = true;
+                    CurrentItem.Downloaded = Utils.DownloadFile(item, OutputHandler,false);
                     CurrentItem.InProgress = false;
                     bs.ResetBindings(false);
                     Application.DoEvents();
@@ -190,9 +189,9 @@ namespace AcumaticaDeployer
 
         private void frmDownloadVersion_FormClosing(object sender, FormClosingEventArgs e)
         {
-            AcumaticaDeployer.Properties.Settings.Default.VersionFilter = cmbVersion.Text;
-            AcumaticaDeployer.Properties.Settings.Default.IncludePreview = chkPreview.Checked;
-            AcumaticaDeployer.Properties.Settings.Default.Save();
+            AcuDevDeployer.Properties.Settings.Default.VersionFilter = cmbVersion.Text;
+            AcuDevDeployer.Properties.Settings.Default.IncludePreview = chkPreview.Checked;
+            AcuDevDeployer.Properties.Settings.Default.Save();
         }
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)

@@ -1,5 +1,5 @@
-﻿using AcumaticaDeployer.Objects;
-using AcumaticaDeployer.ServiceGate;
+﻿using AcuDevDeployer.Objects;
+using AcuDevDeployer.ServiceGate;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Windows.Forms;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     public partial class frmDeploy : Form
     {
@@ -35,9 +35,16 @@ namespace AcumaticaDeployer
         {
             progressBar1.Value = e.ProgressPercentage;
         }
-
         private void DownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
+            if (e.Error != null)
+            {
+                Utils.HasError = true;
+                Utils.Error = e.Error.Message;
+            }else
+            {
+                Utils.HasError = false;
+            }
             Utils.downloading = false;
         }
 
@@ -50,12 +57,7 @@ namespace AcumaticaDeployer
                 cboVersion.Items.AddRange(Items.Where(i => chkPreview.Checked || !i.Preview).OrderByDescending(i => i.AppVersion.Major).ThenByDescending(i => i.AppVersion.Minor).Select(i => i.Version).Distinct().ToArray());//System.IO.Directory.GetDirectories(Settings.PathToInstalls).Select(s => s.Replace(Settings.PathToInstalls, "")).Where(d => d.StartsWith("20")).ToArray<object>());
             }
             catch { }
-            try
-            {
-                cboCustom.Items.Clear();
-                cboCustom.Items.AddRange(Utils.Customizations);
-            }
-            catch { }
+            btnCustRefresh_Click(sender, e);
             this.Text = string.Format("{0} (Cache Date: {1})", Title, Items.FileDate.ToString("MM-dd-yyyy"));
             txtInstance.DataSource = Instances();
             txtInstance.SelectedIndex = -1;
@@ -144,6 +146,7 @@ namespace AcumaticaDeployer
         {
             var list = new DevOptions();
             var row = 0;
+            OptionPanel.Controls.Clear();
             foreach (var option in list)
             {
                 var lbl = new Label() { AutoSize = true, TextAlign = ContentAlignment.MiddleLeft };
@@ -248,38 +251,51 @@ namespace AcumaticaDeployer
             if (!SelectedVersion.Cached)
             {
                 WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion), true);
-                Utils.DownloadFile(SelectedVersion, OutputHandler);
+                Utils.HasError = false;
+                if(!Utils.DownloadFile(SelectedVersion, OutputHandler))
+                {
+                    WriteOutput("Download Error", true);
+                    WriteOutput(Utils.Error);
+                }
+
             }
-            if (!Directory.Exists(ErpPath))
-                Directory.CreateDirectory(ErpPath);
-            if (!Directory.Exists(ErpPath + @"\Scripts"))
-                Directory.CreateDirectory(ErpPath + @"\Scripts");
-            if (!Directory.Exists(ErpPath + @"\Scripts\Setup"))
-                Directory.CreateDirectory(ErpPath + @"\Scripts\Setup");
-            if (!Directory.Exists(ErpPath + @"\Mods"))
-                Directory.CreateDirectory(ErpPath + @"\Mods");
-            var data = File.ReadAllText(AppPath() + @"\Scripts\CreateNewSite.ps1");
-            data = data.Replace("{Acumatica Source Directory}", SourcePath);
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
-            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n" + "IntegratedSecurity=" + chkIntegratedSecurity.Checked.ToString() + "\r\n";
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
-            data = RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
-            instance.Name = txtInstance.Text;
-            BtnUpdateUser_Click(sender, e);
-            btnInstallCustom_Click(sender, e);
-            try
+            if (!Utils.HasError)
             {
-                WriteOutput("Update Web.Config",true);
-                instance.UpdateWebConfig(GetOptions());
+                if (!Directory.Exists(ErpPath))
+                    Directory.CreateDirectory(ErpPath);
+                if (!Directory.Exists(ErpPath + @"\Scripts"))
+                    Directory.CreateDirectory(ErpPath + @"\Scripts");
+                if (!Directory.Exists(ErpPath + @"\Scripts\Setup"))
+                    Directory.CreateDirectory(ErpPath + @"\Scripts\Setup");
+                if (!Directory.Exists(ErpPath + @"\Mods"))
+                    Directory.CreateDirectory(ErpPath + @"\Mods");
+                var data = File.ReadAllText(AppPath() + @"\Scripts\CreateNewSite.ps1");
+                data = data.Replace("{Acumatica Source Directory}", SourcePath);
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
+                data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n" + "IntegratedSecurity=" + chkIntegratedSecurity.Checked.ToString() + "\r\n";
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
+                data = RunScript(ErpPath + @"\Scripts\Setup\CreateNewSite.ps1", cboPatch.SelectedItem.ToString());
+                instance.Name = txtInstance.Text;
+                BtnUpdateUser_Click(sender, e);
+                btnInstallCustom_Click(sender, e);
+                try
+                {
+                    WriteOutput("Update Web.Config", true);
+                    instance.UpdateWebConfig(GetOptions());
+                }
+                catch (Exception ex)
+                {
+                    WriteOutput(ex.Message);
+                }
+                if (!string.IsNullOrWhiteSpace(txtSnapshot.Text))
+                    CreateSnapshotRecord();
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
+                Utils.RefreshItems();
+                var index = cboPatch.SelectedIndex;
+                cboVersion_SelectedIndexChanged(sender, e);
+                cboPatch.SelectedIndex = index;
+                MessageBox.Show("Install Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch ( Exception ex)
-            {
-                WriteOutput(ex.Message);
-            }
-            if (!string.IsNullOrWhiteSpace(txtSnapshot.Text))
-                CreateSnapshotRecord();
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\InstallLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
-            MessageBox.Show("Install Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnUpdateUser_Click(object sender, EventArgs e)
@@ -482,36 +498,49 @@ namespace AcumaticaDeployer
             if (!SelectedVersion.Cached)
             {
                 WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion), true);
-                Utils.DownloadFile(SelectedVersion, OutputHandler);
+                //Utils.DownloadFile(SelectedVersion, OutputHandler);
+                Utils.HasError = false;
+                if (!Utils.DownloadFile(SelectedVersion, OutputHandler))
+                {
+                    WriteOutput("Download Error", true);
+                    WriteOutput(Utils.Error);
+                }
             }
-            if (!Directory.Exists(ErpPath))
-                Directory.CreateDirectory(ErpPath);
-            if (!Directory.Exists(ErpPath + @"\Scripts"))
-                Directory.CreateDirectory(ErpPath + @"\Scripts");
-            if (!Directory.Exists(ErpPath + @"\Scripts\Setup"))
-                Directory.CreateDirectory(ErpPath + @"\Scripts\Setup");
-            var data = File.ReadAllText(AppPath() + @"\Scripts\UpgradeSite.ps1");
-            data = data.Replace("{Acumatica Source Directory}", SourcePath);
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
-            data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n" + "IntegratedSecurity=" + chkIntegratedSecurity.Checked.ToString() + "\r\n";
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
-            btnUnInstallCustom_Click(sender, e);
-            data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
-            instance.Name = txtInstance.Text;
-            BtnUpdateUser_Click(sender, e);
-            btnInstallCustom_Click(sender, e);
-            //instance.UpdateWebConfig(GetOptions());
-            try
+            if (!Utils.HasError)
             {
-                WriteOutput("Update Web.Config", true);
-                instance.UpdateWebConfig(GetOptions());
+                if (!Directory.Exists(ErpPath))
+                    Directory.CreateDirectory(ErpPath);
+                if (!Directory.Exists(ErpPath + @"\Scripts"))
+                    Directory.CreateDirectory(ErpPath + @"\Scripts");
+                if (!Directory.Exists(ErpPath + @"\Scripts\Setup"))
+                    Directory.CreateDirectory(ErpPath + @"\Scripts\Setup");
+                var data = File.ReadAllText(AppPath() + @"\Scripts\UpgradeSite.ps1");
+                data = data.Replace("{Acumatica Source Directory}", SourcePath);
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", System.Text.Encoding.UTF8.GetBytes(data));
+                data = "InstanceName=" + txtInstance.Text + "\r\nDatabaseServer=" + txtDBServer.Text + "\r\nDatabaseName=" + txtDBName.Text + "\r\nIsNewDatabase=" + chkNewDB.Checked.ToString() + "\r\nInsertDemoData=" + chkDemoData.Checked.ToString() + "\r\nAcumaticaERPInstallDirectory=" + SourcePath + "\r\nIsPortal=" + chkPortal.Checked.ToString() + "\r\n" + "DatabaseUser=" + txtDBUser.Text.ToString() + "\r\n" + "DatabasePass=" + txtDBPass.Text.ToString() + "\r\n" + "IntegratedSecurity=" + chkIntegratedSecurity.Checked.ToString() + "\r\n";
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\SiteParameters.txt", System.Text.Encoding.UTF8.GetBytes(data));
+                btnUnInstallCustom_Click(sender, e);
+                data = RunScript(ErpPath + @"\Scripts\Setup\UpgradeSite.ps1", cboPatch.SelectedItem.ToString());
+                instance.Name = txtInstance.Text;
+                BtnUpdateUser_Click(sender, e);
+                btnInstallCustom_Click(sender, e);
+                //instance.UpdateWebConfig(GetOptions());
+                try
+                {
+                    WriteOutput("Update Web.Config", true);
+                    instance.UpdateWebConfig(GetOptions());
+                }
+                catch (Exception ex)
+                {
+                    WriteOutput(ex.Message);
+                }
+                File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
+                Utils.RefreshItems();
+                var index = cboPatch.SelectedIndex;
+                cboVersion_SelectedIndexChanged(sender, e);
+                cboPatch.SelectedIndex = index;
+                MessageBox.Show("Upgrade Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
-            {
-                WriteOutput(ex.Message);
-            }
-            File.WriteAllBytes(ErpPath + @"\Scripts\Setup\UpgradeLog.txt", System.Text.Encoding.UTF8.GetBytes(OutputLog));
-            MessageBox.Show("Upgrade Done", "Install Site", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnGetNewVersions_Click(object sender, EventArgs e)
@@ -521,6 +550,7 @@ namespace AcumaticaDeployer
                 FrmDeploy = this
             };
             frm.ShowDialog();
+            FrmDeploy_Load(sender, e);
         }
 
         private void BtnSettings_Click(object sender, EventArgs e)
@@ -547,6 +577,7 @@ namespace AcumaticaDeployer
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             Items.RefreshData();
+            FrmDeploy_Load(sender, e);
         }
 
         private bool dbSetup = false;
@@ -617,12 +648,12 @@ namespace AcumaticaDeployer
                 client.Url = string.Format("http://localhost/{0}/api/ServiceGate.asmx", txtInstance.Text);
                 LoginResult lr = client.Login(txtACUser.Text, txtACPass.Text);
                 List<string> packages = new List<string>();
-                foreach (string item in cboCustom.CheckedItems)
+                foreach (CustomizationItem item in cboCustom.CheckedItems)
                 {
-                    var fi = new FileInfo(item);
-                    File.Copy(item, ErpPath + @"\mods\" + fi.Name, true);
+                    var fi = new FileInfo(item.Path);
+                    File.Copy(item.Path, ErpPath + @"\mods\" + fi.Name, true);
                     packages.Add(fi.Name);
-                    client.UploadPackage(fi.Name, System.IO.File.ReadAllBytes(item), true);
+                    client.UploadPackage(fi.Name, System.IO.File.ReadAllBytes(item.Path), true);
                 }
                 IsPublishing = true;
 
@@ -903,6 +934,31 @@ namespace AcumaticaDeployer
                 if (!string.IsNullOrWhiteSpace(txtDBName.Text))
                     await TestSQLConnectionAsync(SQLConnectionSettings.Database);
             }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            if(instance?.webConfig!=null)
+            {
+                var url = "http://localhost/" + instance.vdir;
+                Process.Start(url);
+            }
+
+        }
+
+        private void btnCustRefresh_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                cboCustom.Items.Clear();
+                cboCustom.Items.AddRange(Utils.Customizations);
+            }
+            catch { }
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtDBName_TextChanged(sender, e);
         }
     }
 }

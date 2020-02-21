@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     [Serializable]
     public class DownloadItem
@@ -52,7 +52,7 @@ namespace AcumaticaDeployer
         {
             get
             {
-                return Utils.CheckFile(Filename, Settings.PathToInstalls);
+                return Utils.CheckFile(this, Settings.PathToInstalls);
             }
         }
 

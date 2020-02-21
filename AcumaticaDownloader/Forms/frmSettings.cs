@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     public partial class frmSettings : Form
     {

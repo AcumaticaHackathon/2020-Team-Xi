@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 
-namespace AcumaticaDeployer.Objects
+namespace AcuDevDeployer.Objects
 {
     public class Instance
     {
@@ -29,18 +29,30 @@ namespace AcumaticaDeployer.Objects
             get
             {
                 //Configuration config = webConfig;
-                var test = webConfig.ConnectionStrings.ConnectionStrings.GetEnumerator();
-                while (test.Current == null || ((ConnectionStringSettings)test.Current)?.Name != "ProjectX")
-                    if (!test.MoveNext())
-                        break;
-                ConnectionStringSettings item = (ConnectionStringSettings)test.Current;
-                if (item.Name != "ProjectX")
-                    return "";
-                else
-                    return item.ConnectionString;
+                var test = webConfig?.ConnectionStrings?.ConnectionStrings?.GetEnumerator();
+                if (test != null)
+                {
+                    while (test?.Current == null || ((ConnectionStringSettings)test.Current)?.Name != "ProjectX")
+                        if (!test.MoveNext())
+                            break;
+                    ConnectionStringSettings item = (ConnectionStringSettings)test.Current;
+                    if (item.Name != "ProjectX")
+                        return "";
+                    else
+                        return item.ConnectionString;
+                }
+                return "";
             }
         }
-
+        public string vdir
+        {
+            get
+            {
+                var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Acumatica ERP");
+                var retVal = key?.OpenSubKey(Name);
+                return retVal.GetValue("VirtDirName").ToString();
+            }
+        }
         public string siteVersion
         {
             get
@@ -59,11 +71,14 @@ namespace AcumaticaDeployer.Objects
             {
                 if (_webConfig == null)
                 {
-                    var configFile = new FileInfo(ErpPath + @"\site\web.config");
-                    var vdm = new VirtualDirectoryMapping(configFile.DirectoryName, true, configFile.Name);
-                    var wcfm = new WebConfigurationFileMap();
-                    wcfm.VirtualDirectories.Add("/", vdm);
-                    _webConfig = WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
+                    if (File.Exists(ErpPath + @"web.config"))
+                    {
+                        var configFile = new FileInfo(ErpPath + @"web.config");
+                        var vdm = new VirtualDirectoryMapping(configFile.DirectoryName, true, configFile.Name);
+                        var wcfm = new WebConfigurationFileMap();
+                        wcfm.VirtualDirectories.Add("/", vdm);
+                        _webConfig = WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
+                    }
                 }
                 return _webConfig;
             }
@@ -72,7 +87,18 @@ namespace AcumaticaDeployer.Objects
         {
             get
             {
-                return string.Format("{0}{1}", Settings.PathToAcumatica, Name);
+                var path = string.Format(@"{0}{1}\site\", Settings.PathToAcumatica, Name);
+                if(!Directory.Exists(path))
+                {
+                    try
+                    {
+                        var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Acumatica ERP");
+                        var retVal = key?.OpenSubKey(Name);
+                        path = retVal?.GetValue("Path").ToString();
+                    }
+                    catch { }
+                }
+                return path;
             }
         }
         public void UpdateWebConfig(DevOptions options)

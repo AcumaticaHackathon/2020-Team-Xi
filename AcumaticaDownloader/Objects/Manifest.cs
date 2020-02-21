@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     [XmlRoot(ElementName = "generalInfo")]
     public class GeneralInfo

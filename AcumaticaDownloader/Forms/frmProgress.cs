@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     public partial class frmProgress : Form
     {

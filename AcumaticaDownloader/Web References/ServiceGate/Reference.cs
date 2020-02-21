@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace AcumaticaDeployer.ServiceGate {
+namespace AcuDevDeployer.ServiceGate {
     using System;
     using System.Web.Services;
     using System.Diagnostics;
@@ -80,7 +80,7 @@ namespace AcumaticaDeployer.ServiceGate {
         
         /// <remarks/>
         public ServiceGate() {
-            this.Url = global::AcumaticaDeployer.Properties.Settings.Default.AcumaticaDeployer_ServiceGate_ServiceGate;
+            this.Url = global::AcuDevDeployer.Properties.Settings.Default.AcumaticaDeployer_ServiceGate_ServiceGate;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

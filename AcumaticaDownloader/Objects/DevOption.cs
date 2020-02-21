@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     public class DevOption
     {
@@ -43,17 +43,17 @@ namespace AcumaticaDeployer
             {
                 Label = "Compile Pages",
                 Name = "CompilePages",
-                Desc = "An indicator of whether the application compiles the website pages at the website launching to warm up the application. Better to have it false on development instance to speed up performance. InstantiateAllCaches(Default true) – creates a separate thread to create all possible PXCache objects.That helps to run screens faster on first access",
+                Desc = "An indicator of whether the application compiles the website pages at the website launching to warm up the application. Better to have it false on development instance to speed up performance. ",
                 Type = "System.Boolean",
-                Recommend="True"
+                Recommend="False"
             },
             new DevOption()
             {
                 Label= "Instantiate All Caches ",
                 Name = "InstantiateAllCaches ",
-                Desc = "creates a separate thread to create all possible PXCache objects. That helps to run screens faster on first access",
+                Desc = "(Default true) – creates a separate thread to create all possible PXCache objects.That helps to run screens faster on first access",
                 Type = "System.Boolean",
-                Recommend="False"
+                Recommend="True"
             },
             new DevOption()
             {
@@ -101,7 +101,7 @@ namespace AcumaticaDeployer
                 Name = "EnableFirstChanceExceptionsLogging",
                 Desc = "An indicator of whether the system logs first chance exceptions",
                 Type = "System.Boolean",
-                Recommend="False"
+                Recommend="True"
             },
             new DevOption()
             {

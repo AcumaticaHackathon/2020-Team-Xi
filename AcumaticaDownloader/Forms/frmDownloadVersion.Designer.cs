@@ -1,7 +1,7 @@
 ﻿using CheckComboBox;
 using System;
 
-namespace AcumaticaDeployer
+namespace AcuDevDeployer
 {
     partial class frmDownloadVersion
     {
