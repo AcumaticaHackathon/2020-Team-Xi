@@ -117,6 +117,8 @@ namespace AcuDevDeployer
                     var retval = config.AppSettings.Settings["CustomizationPath"].Value;
                     if (string.IsNullOrWhiteSpace(retval))
                         retval = Properties.Settings.Default.CustomizationFolder;
+                    if (!retval.Last().Equals('\\'))
+                        retval += "\\";
                     return retval;
                 }
                 return Properties.Settings.Default.CustomizationFolder;
@@ -176,10 +178,13 @@ namespace AcuDevDeployer
                 {
                     var retval = config.AppSettings.Settings["PathToInstalls"].Value;
                     if (string.IsNullOrWhiteSpace(retval))
-                        retval = Application.StartupPath;
+                        retval = Application.StartupPath + "\\";
+                    if (!retval.Last().Equals('\\'))
+                        retval += "\\";
+
                     return retval;
                 }
-                return Application.StartupPath;
+                return Application.StartupPath + "\\";
             }
             set
             {
@@ -266,10 +271,12 @@ namespace AcuDevDeployer
                 {
                     var retval = config.AppSettings.Settings["PathToAcumatica"].Value;
                     if (string.IsNullOrWhiteSpace(retval))
-                        retval = Application.StartupPath;
+                        retval = Application.StartupPath + "\\";
+                    if (!retval.Last().Equals('\\'))
+                        retval += "\\";
                     return retval;
                 }
-                return Application.StartupPath;
+                return Application.StartupPath + "\\";
             }
             set
             {
