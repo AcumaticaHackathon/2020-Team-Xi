@@ -248,8 +248,15 @@ namespace AcuDevDeployer
 
         private void BtnInstall_Click(object sender, EventArgs e)
         {
+
             if (!SelectedVersion.Cached)
             {
+                if (!File.Exists(Settings.PathToInstalls + @"\ProcessAcumaticaInstaller.ps1"))
+                {
+                    var data = File.ReadAllText(Application.StartupPath + @"\scripts\ProcessAcumaticaInstaller.ps1");
+                    data = data.Replace("{targetFolder}", Settings.PathToInstalls);
+                    File.WriteAllBytes(Settings.PathToInstalls + @"\ProcessAcumaticaInstaller.ps1", System.Text.Encoding.Default.GetBytes(data));
+                }
                 WriteOutput(string.Format("Downloading Acumatica install for version: {0}", ((DownloadItem)cboPatch.SelectedItem).PatchVersion), true);
                 Utils.HasError = false;
                 if(!Utils.DownloadFile(SelectedVersion, OutputHandler))
